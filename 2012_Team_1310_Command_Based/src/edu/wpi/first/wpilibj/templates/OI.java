@@ -9,8 +9,9 @@ public class OI {
     
     final int DRIVER_TOGGLE_PID = 1;
     final int DRIVER_TOGGLE_FOLLOW_TARGET = 5;
-    final int DRIVER_TOGGLE_AUTO_BALANCE = 7;
-    final int DRIVER_TRANS_SHIFT_BUTTON = 8;
+    final int DRIVER_TOGGLE_AUTO_BALANCE = 2;
+    final int DRIVER_LOW_GEAR_BUTTON = 7;
+    final int DRIVER_HIGH_GEAR_BUTTON = 8;
     
     public Joystick stickDriver = new Joystick(1);
     public Joystick stickOperator = new Joystick(2);
@@ -30,8 +31,16 @@ public class OI {
         return Math.abs(axis) >= AXIS_DEAD_ZONE ? axis : 0.0;
     }
     
-    public boolean getTransShiftButton() {
-        return stickDriver.getRawButton(DRIVER_TRANS_SHIFT_BUTTON);
+    public double getSliderAxis() {
+        return stickOperator.getAxis(Joystick.AxisType.kThrottle);
+    }
+    
+    public boolean getLowGearButton() {
+        return stickDriver.getRawButton(DRIVER_LOW_GEAR_BUTTON);
+    }
+    
+    public boolean getHighGearButton() {
+        return stickDriver.getRawButton(DRIVER_HIGH_GEAR_BUTTON);
     }
     
     public boolean getPIDToggle() {

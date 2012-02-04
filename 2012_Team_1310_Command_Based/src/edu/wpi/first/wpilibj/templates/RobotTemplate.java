@@ -10,10 +10,11 @@ package edu.wpi.first.wpilibj.templates;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableGyro;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.templates.commands.CommandBase;
+import edu.wpi.first.wpilibj.templates.commands.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,20 +27,32 @@ public class RobotTemplate extends IterativeRobot {
     
     Compressor compressor;
     
+    SendableChooser autonomousChooser;
+    
+    Command autonomousCommand;
+    
+    public interface CommandCreator {
+        public abstract Command create();
+    }
+    
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
-        compressor = new Compressor(10, 1); 
-        compressor.start();
-        
-        CommandBase.chassisSubsystem.gyroXY = new SendableGyro(RobotMap.GYRO_YZ);
-        CommandBase.chassisSubsystem.gyroYZ = new SendableGyro(RobotMap.GYRO_YZ);
-        SmartDashboard.putData("YZGyro", CommandBase.chassisSubsystem.gyroYZ);
-        
         // Initialize all subsystems
         CommandBase.init();
+        
+        compressor = new Compressor(RobotMap.COMPRESSOR_DI, 1); 
+        compressor.start();
+        
+        autonomousChooser = new SendableChooser();
+        autonomousChooser.addDefault("Nothing", DriveDistanceCommand.creator(0));
+        autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
+        autonomousChooser.addObject("Shoot-Then-Tip", ShootTipCommandGroup.creator());
+        autonomousChooser.addObject("Shoot-Then-Tip-Then-Shoot", ShootTipShootCommandGroup.creator());
+        
+        SmartDashboard.putData("Autonomous", autonomousChooser);
     }
     
     //Called when disabled mode is entered
@@ -47,9 +60,16 @@ public class RobotTemplate extends IterativeRobot {
     }
     //Called when autonomous mode is entered
     public void autonomousInit() {
+        CommandCreator creator = (CommandCreator)autonomousChooser.getSelected();
+        autonomousCommand = creator.create();
+        System.out.println("autonomousInit starting " + autonomousCommand);
+        autonomousCommand.start();
     }
     //Called when teleop mode is entered
     public void teleopInit() {
+        if(autonomousCommand != null) {
+            autonomousCommand.cancel();
+        }
     }
 
     //This function is called periodically when disabled
@@ -68,7 +88,7 @@ public class RobotTemplate extends IterativeRobot {
     }
     
     //Custom print function
-    final double PRINT_DELAY = 1.0;
+    final double PRINT_DELAY = 0.125;
     double lastPrintTime = 0.0;
     public void print(String mode) {
         final double now = Timer.getFPGATimestamp();
@@ -79,17 +99,16 @@ public class RobotTemplate extends IterativeRobot {
             System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
             System.out.println("[" + mode + "]");
-
-            System.out.println("Drive Axis: " + -CommandBase.oi.stickDriver.getRawAxis(CommandBase.oi.DRIVER_SPEED_AXIS));
             
-            if(CommandBase.chassisSubsystem != null) {
-                System.out.println("EncLeft: " + CommandBase.chassisSubsystem.encLeft.getRate() + " EncRight: " + CommandBase.chassisSubsystem.encRight.getRate());
-                System.out.println("PidLeftSetpoint: " + CommandBase.chassisSubsystem.pidLeft.getSetpoint() + " PidRightSetpoint: " + CommandBase.chassisSubsystem.pidRight.getSetpoint());
-                System.out.println("PidLeftOutput: " + CommandBase.chassisSubsystem.pidLeft.get() + " PidRightOutput: " + CommandBase.chassisSubsystem.pidRight.get());
-            }
-            System.out.println("GyroYZ Angle: " + CommandBase.chassisSubsystem.gyroYZ.getAngle());
-            //if(CommandBase.cameraSubsystem != null && CommandBase.cameraSubsystem.cameraServo != null)
-            //    System.out.println("Servo angle: " + (CommandBase.cameraSubsystem.cameraServo.getPosition() * 180));
+            CommandBase.chassisSubsystem.print();
+            
+            System.out.println();
+            
+            CommandBase.elevatorSubsystem.print();
+            
+            System.out.println();
+            
+            CommandBase.shooterSubsystem.print();
         }
     }
 }

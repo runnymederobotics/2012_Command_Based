@@ -3,8 +3,8 @@ package edu.wpi.first.wpilibj.templates.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.OI;
-import edu.wpi.first.wpilibj.templates.CameraSystem;
 import edu.wpi.first.wpilibj.templates.subsystems.ChassisSubsystem;
+import edu.wpi.first.wpilibj.templates.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj.templates.subsystems.ShooterSubsystem;
 
 /**
@@ -19,6 +19,7 @@ public abstract class CommandBase extends Command {
     // Create a single static instance of all of your subsystems
     public static ChassisSubsystem chassisSubsystem = new ChassisSubsystem();
     public static ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    public static ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     
     public static void init() {
         // This MUST be here. If the OI creates Commands (which it very likely
@@ -31,6 +32,7 @@ public abstract class CommandBase extends Command {
         // Show what command your subsystem is running on the SmartDashboard
         SmartDashboard.putData(chassisSubsystem);
         SmartDashboard.putData(shooterSubsystem);
+        SmartDashboard.putData(elevatorSubsystem);
     }
 
     public CommandBase(String name) {

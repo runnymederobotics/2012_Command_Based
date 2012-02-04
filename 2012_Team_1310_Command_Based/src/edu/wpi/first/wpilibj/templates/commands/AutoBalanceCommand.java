@@ -84,7 +84,7 @@ public class AutoBalanceCommand extends CommandBase {
             curState = AutoBalanceState.HORIZONTAL;
         }
  
-        chassisSubsystem.setSetpoint(speed, 0.0);
+        chassisSubsystem.drive(speed, 0.0, false); //Dont allow high speed
     }
     
     // Make this return true when this Command no longer needs to run execute()

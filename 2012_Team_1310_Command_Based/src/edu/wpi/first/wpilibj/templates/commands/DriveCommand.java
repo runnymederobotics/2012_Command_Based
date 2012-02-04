@@ -14,10 +14,13 @@ public class DriveCommand extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        if(oi.getTransShiftButton()) {
-            chassisSubsystem.transShift(true);
-        } else {
+        boolean allowTransShift = true;
+        if(oi.getLowGearButton()) {
             chassisSubsystem.transShift(false);
+            allowTransShift = false;
+        } else if(oi.getHighGearButton()) {
+            chassisSubsystem.transShift(true);
+            allowTransShift = false;
         }
         
         if(oi.getFollowTargetToggle()) {
@@ -36,7 +39,7 @@ public class DriveCommand extends CommandBase {
             chassisSubsystem.disablePID();
         }
         
-        chassisSubsystem.setSetpoint(oi.getSpeedAxis(), oi.getRotationAxis());
+        chassisSubsystem.drive(oi.getSpeedAxis(), oi.getRotationAxis(), allowTransShift);
     }
 
     // Make this return true when this Command no longer needs to run execute()

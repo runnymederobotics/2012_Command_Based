@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
+import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.templates.CameraSystem;
 
 public class FollowTargetCommand extends CommandBase {
@@ -39,6 +40,11 @@ public class FollowTargetCommand extends CommandBase {
             cameraSubsystem.setServoAngle(servoAngle + searchDirection * CAMERA_SEARCH_SPEED);
         }*/
         
+        if(!oi.getFollowTargetToggle()) {
+            //Driving takes over this command because it requires(chassisSubsystem)
+            Scheduler.getInstance().add(new DriveCommand());
+        }
+        
         double gyroAngle = chassisSubsystem.getXYAngle();
         
         boolean canSeeTarget = CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
@@ -46,7 +52,7 @@ public class FollowTargetCommand extends CommandBase {
             chassisSubsystem.setAngleSetpoint(gyroAngle + targetAngle[0] / 5);
         }
         
-        chassisSubsystem.goToGyroSetpoint();
+        chassisSubsystem.goToAngleSetpoint();
     }
 
     // Make this return true when this Command no longer needs to run execute()

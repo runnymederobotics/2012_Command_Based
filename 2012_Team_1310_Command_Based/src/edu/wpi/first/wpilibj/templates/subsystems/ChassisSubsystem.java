@@ -5,107 +5,112 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableGyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.templates.CountEncoder;
 import edu.wpi.first.wpilibj.templates.OutputStorage;
 import edu.wpi.first.wpilibj.templates.Pneumatic;
 import edu.wpi.first.wpilibj.templates.RobotMap;
+import edu.wpi.first.wpilibj.templates.commands.CommandBase;
 import edu.wpi.first.wpilibj.templates.commands.DriveCommand;
 
 public class ChassisSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
     
-    public static final int MAX_LOW_ENCODER_RATE = 800;
-    public static final int MAX_HIGH_ENCODER_RATE = 1900;
-    public static final double AUTO_TRANS_THRESHOLD = 0.6;
+    final int MAX_LOW_ENCODER_RATE = 800;
+    final int MAX_HIGH_ENCODER_RATE = 1900;
+    final double AUTO_TRANS_THRESHOLD = 0.6;
     
-    public static final double PID_P = 0.0, PID_I = 0.0005, PID_D = 0.0;
+    final double PID_COUNT_TOLERANCE = 10; //Counts
+    final double PID_GYRO_TOLERANCE = 1; //Degrees
     
-    NetworkTable encoderTable;
+    final double PID_COUNT_MAX_INPUT = Short.MAX_VALUE;
+    final double PID_COUNT_MIN_INPUT = Short.MIN_VALUE;
     
-    public Victor motorLeft;
-    public Victor motorRight;
+    final double PID_COUNT_MAX_OUTPUT = 0.25;
+    final double PID_GYRO_MAX_OUTPUT = 0.25;
     
-    OutputStorage storageLeft;
-    OutputStorage storageRight;
+    final double PID_P = 0.0, PID_I = 0.0001, PID_D = 0.0;
+    final double PID_GYRO_P = 0.001, PID_GYRO_I = 0.0, PID_GYRO_D = 0.0;
+    final double PID_COUNT_P = 0.05, PID_COUNT_I = 0.0, PID_COUNT_D = 0.0;
     
-    RobotDrive robotDrive;
+    Victor motorLeft = new Victor(RobotMap.LEFT_MOTOR);
+    Victor motorRight = new Victor(RobotMap.RIGHT_MOTOR);
     
-    public Encoder encLeft;
-    public Encoder encRight;
+    OutputStorage storageLeft = new OutputStorage();
+    OutputStorage storageRight = new OutputStorage();
     
-    public SendablePIDController pidLeft;
-    public SendablePIDController pidRight;
+    RobotDrive robotDrive = new RobotDrive(storageLeft, storageRight);
     
-    public SendableGyro gyroXY;
-    public SendableGyro gyroYZ;
+    Encoder encLeft = new Encoder(RobotMap.ENC_LEFT_A, RobotMap.ENC_LEFT_B, true);
+    Encoder encRight = new Encoder(RobotMap.ENC_RIGHT_A, RobotMap.ENC_RIGHT_B, true);
     
-    OutputStorage pidGyroStorage;
-    SendablePIDController pidGyro;
+    SendablePIDController pidLeft = new SendablePIDController(PID_P, PID_I, PID_D, encLeft, motorLeft);
+    SendablePIDController pidRight = new SendablePIDController(PID_P, PID_I, PID_D, encRight, motorRight);
     
-    Pneumatic transShift;
+    SendableGyro gyroXY = new SendableGyro(RobotMap.GYRO_XY);
+    SendableGyro gyroYZ = new SendableGyro(RobotMap.GYRO_YZ);
+    
+    OutputStorage pidGyroStorage = new OutputStorage();
+    SendablePIDController pidGyro = new SendablePIDController(PID_GYRO_P, PID_GYRO_I, PID_GYRO_D, gyroXY, pidGyroStorage);
+    
+    CountEncoder encLeftCount = new CountEncoder(encLeft, true); //Reverse again for counts
+    CountEncoder encRightCount = new CountEncoder(encRight, false);
+    OutputStorage pidLeftCountStorage = new OutputStorage();
+    OutputStorage pidRightCountStorage = new OutputStorage();
+    SendablePIDController pidLeftCount = new SendablePIDController(PID_COUNT_P, PID_COUNT_I, PID_COUNT_D, encLeftCount, pidLeftCountStorage);
+    SendablePIDController pidRightCount = new SendablePIDController(PID_COUNT_P, PID_COUNT_I, PID_COUNT_D, encRightCount, pidRightCountStorage);
+    
+    Pneumatic transShift = new Pneumatic(new DoubleSolenoid(1, 2));
 
-    double maxEncoderRate;
+    double maxEncoderRate = MAX_LOW_ENCODER_RATE;
     
-    public void initDefaultCommand() {
-        motorLeft = new Victor(RobotMap.LEFT_MOTOR);
-        motorRight = new Victor(RobotMap.RIGHT_MOTOR);
-        
-        storageLeft = new OutputStorage();
-        storageRight = new OutputStorage();
-        
-        robotDrive = new RobotDrive(storageLeft, storageRight);
-        
-        encLeft = new Encoder(RobotMap.ENC_LEFT_A, RobotMap.ENC_LEFT_B, true);
-        encRight = new Encoder(RobotMap.ENC_RIGHT_A, RobotMap.ENC_RIGHT_B, true);
+    public ChassisSubsystem() {
         encLeft.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encRight.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encLeft.start();
         encRight.start();
         
-        pidLeft = new SendablePIDController(PID_P, PID_I, PID_D, encLeft, motorLeft);
-        pidRight = new SendablePIDController(PID_P, PID_I, PID_D, encRight, motorRight);
-        SmartDashboard.putData("PIDLeft", pidLeft);
-        SmartDashboard.putData("PIDRight", pidRight);
-        
         gyroXY.reset();
         gyroYZ.reset();
         
-        pidGyroStorage = new OutputStorage();
-        pidGyro = new SendablePIDController(0.0, 0.0, 0.0, gyroXY, pidGyroStorage);
+        pidGyro.setTolerance(PID_GYRO_TOLERANCE / 360);
+        pidGyro.setContinuous();
+        pidGyro.setInputRange(-180, 180);
+        pidGyro.setOutputRange(-PID_GYRO_MAX_OUTPUT, PID_GYRO_MAX_OUTPUT);
+ 
+        pidLeftCount.setTolerance(PID_COUNT_TOLERANCE / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
+        pidLeftCount.setInputRange(PID_COUNT_MIN_INPUT, PID_COUNT_MAX_INPUT);
+        pidLeftCount.setOutputRange(-PID_COUNT_MAX_OUTPUT, PID_COUNT_MAX_OUTPUT);
+
+        pidRightCount.setTolerance(PID_COUNT_TOLERANCE / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
+        pidRightCount.setInputRange(PID_COUNT_MIN_INPUT, PID_COUNT_MAX_INPUT);
+        pidRightCount.setOutputRange(-PID_COUNT_MAX_OUTPUT, PID_COUNT_MAX_OUTPUT);
         
-        transShift = new Pneumatic(new DoubleSolenoid(1, 2));
-        
-        maxEncoderRate = MAX_LOW_ENCODER_RATE;
         updateInputRange();
         
+        SmartDashboard.putData("PIDLeft", pidLeft);
+        SmartDashboard.putData("PIDRight", pidRight);
+        SmartDashboard.putData("XYGyro", gyroXY);
+        SmartDashboard.putData("YZGyro", gyroYZ);
+        SmartDashboard.putData("PIDGyro", pidGyro);
+        SmartDashboard.putData("PIDLeftCount", pidLeftCount);
+        SmartDashboard.putData("PIDRightCount", pidRightCount);
+    }
+    
+    public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         setDefaultCommand(new DriveCommand());
     }
     
-    void updateInputRange() {
+    private void updateInputRange() {
         pidLeft.setInputRange(-maxEncoderRate, maxEncoderRate);
         pidLeft.setOutputRange(-1.0, 1.0);
         
         pidRight.setInputRange(-maxEncoderRate, maxEncoderRate);
         pidRight.setOutputRange(-1.0, 1.0);
-    }
-    
-    public void disablePIDGyro() {
-        if(pidGyro.isEnable()) {
-            pidGyro.disable();
-        }
-    }
-    
-    public void enablePIDGyro() {
-        if(!pidGyro.isEnable()) {
-            gyroXY.reset();
-            pidGyro.enable();
-            pidGyro.setSetpoint(0.0);
-        }
     }
     
     public void disablePID() {
@@ -115,10 +120,42 @@ public class ChassisSubsystem extends Subsystem {
         }
     }
     
+    public void disablePIDCount() {
+        if(pidLeftCount.isEnable() || pidRightCount.isEnable()) {
+            pidLeftCount.disable();
+            pidRightCount.disable();
+        }
+    }
+    
+    public void disablePIDGyro() {
+        if(pidGyro.isEnable()) {
+            pidGyro.disable();
+        }
+    }
+
     public void enablePID() {
         if(!pidLeft.isEnable() || !pidRight.isEnable()) {
             pidLeft.enable();
             pidRight.enable();
+        }
+    }
+    
+    public void enablePIDCount() {
+        if(!pidLeftCount.isEnable() || !pidRightCount.isEnable()) {
+            encLeft.reset();
+            encRight.reset();
+            pidLeftCount.enable();
+            pidRightCount.enable();
+            pidLeftCount.setSetpoint(0.0);
+            pidRightCount.setSetpoint(0.0);
+        }
+    }
+    
+    public void enablePIDGyro() {
+        if(!pidGyro.isEnable()) {
+            gyroXY.reset();
+            pidGyro.enable();
+            pidGyro.setSetpoint(0.0);
         }
     }
     
@@ -136,34 +173,90 @@ public class ChassisSubsystem extends Subsystem {
         updateInputRange();
     }
     
+    public void setCountSetpoint(int encoderCounts) {
+        disablePIDCount(); //Make sure we reset the encoders
+        enablePIDCount();
+        //enablePID();
+        
+        pidLeftCount.setSetpoint(encoderCounts);
+        pidRightCount.setSetpoint(encoderCounts);
+    }
+    
     public void setAngleSetpoint(double angle) {
+        disablePIDGyro(); //Make sure we reset the gyro
         enablePIDGyro();
+        //enablePID();
         
         pidGyro.setSetpoint(angle);
     }
     
-    public void goToGyroSetpoint() {
-        setSetpoint(0.0, pidGyroStorage.get());
+    public void goToCountSetpoint() {
+        if(pidLeftCount.onTarget() && pidRightCount.onTarget()) {
+            disablePIDCount();
+        } else {
+            robotDrive.arcadeDrive(0.0, 0.0); //Keep robotDrive updated
+            
+            setSetpoint(-pidLeftCount.get(), pidRightCount.get(), false); //Dont allow high speed
+        }
     }
     
-    public void setSetpoint(double speed, double rotation) {
-        
-        
-        /*if(!transShift.get() && Math.abs(encLeft.get()) >= MAX_LOW_ENCODER_RATE * AUTO_TRANS_THRESHOLD
-                && Math.abs(encRight.get()) >= MAX_LOW_ENCODER_RATE * AUTO_TRANS_THRESHOLD)*/
-        /*if(Math.abs(speed) >= AUTO_TRANS_THRESHOLD)
-            transShift(true);
-        else if(transShift.get())
-            transShift(false);*/
+    public void goToAngleSetpoint() {
+        if(pidGyro.onTarget()) {
+            disablePIDGyro();
+        } else {
+            drive(0.0, pidGyro.get(), false); //Dont allow high speed
+        }
+    }
+    
+    public boolean reachedCountSetpoint() {
+        return (pidLeftCount.onTarget() && pidRightCount.onTarget());
+    }
+    
+    public boolean reachedAngleSetpoint() {
+        return pidGyro.onTarget();
+    }
+    
+    public void drive(double speed, double rotation, boolean autoTrans) {
         robotDrive.arcadeDrive(speed, rotation);
-        
+
+        setSetpoint(storageLeft.get(), storageRight.get(), autoTrans);
+    }
+    
+    private void setSetpoint(double left, double right, boolean autoTrans) {
+        if(autoTrans) {
+            int rate = (Math.abs(encLeft.get()) + Math.abs(encRight.get())) / 2; //Average rate
+            
+            double LOW_SPEED_PERCENT = 0.9; //Threshold to switch at when in low speed
+            double HIGH_SPEED_PERCENT = 0.6; //Threshold to switch at when in high speed
+            
+            if(!transShift.get())
+                transShift.set((rate >= LOW_SPEED_PERCENT * MAX_LOW_ENCODER_RATE) ? true : transShift.get());
+            else if(transShift.get())
+                transShift.set((rate <= HIGH_SPEED_PERCENT * MAX_HIGH_ENCODER_RATE) ? false : transShift.get());
+        }
         
         if(pidLeft.isEnable() && pidRight.isEnable()) {
-            pidLeft.setSetpoint(storageLeft.get() * maxEncoderRate);
-            pidRight.setSetpoint(storageRight.get() * maxEncoderRate);
+            pidLeft.setSetpoint(left * maxEncoderRate);
+            pidRight.setSetpoint(right * maxEncoderRate);
         } else {
-            motorLeft.set(storageLeft.get());
-            motorRight.set(storageRight.get()); 
+            motorLeft.set(left);
+            motorRight.set(right);
         }
+    }
+    
+    public void print() {
+        System.out.println("(Chassis Subsystem)");
+        
+        System.out.println("PIDLeftCount output: " + pidLeftCount.get() + " PIDRightCount output: " + pidRightCount.get());
+        System.out.println("PIDLeftCount setpoint: " + pidLeftCount.getSetpoint() + " PIDRightCount setpoint: " + pidRightCount.getSetpoint());
+        System.out.println("EncLeftCount: " + encLeftCount.pidGet() + " EncRightCount: " + encRightCount.pidGet());
+        System.out.println("PIDLeftCount storage: " + pidLeftCountStorage.get() + " PIDRightCount storage: " + pidRightCountStorage.get());
+        System.out.println("PIDEnabled: " + (pidLeft.isEnable() && pidRight.isEnable()));
+        
+        System.out.println("OI Drive axis: " + CommandBase.oi.getSpeedAxis() + " OI Rotation Axis: " + CommandBase.oi.getRotationAxis());
+        
+        System.out.println("PIDLeft output: " + pidLeft.get() + " PIDRight output: " + pidRight.get());
+        System.out.println("PIDLeft setpoint: " + pidLeft.getSetpoint() + " PIDRight setpoint: " + pidRight.getSetpoint());
+        System.out.println("EncLeftRate: " + encLeft.getRate() + " EncRightRate: " + encRight.getRate());
     }
 }
