@@ -3,9 +3,7 @@ package edu.wpi.first.wpilibj.templates.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.OI;
-import edu.wpi.first.wpilibj.templates.subsystems.ChassisSubsystem;
-import edu.wpi.first.wpilibj.templates.subsystems.ElevatorSubsystem;
-import edu.wpi.first.wpilibj.templates.subsystems.ShooterSubsystem;
+import edu.wpi.first.wpilibj.templates.subsystems.*;
 
 /**
  * The base for all commands. All atomic commands should subclass CommandBase.
@@ -20,6 +18,8 @@ public abstract class CommandBase extends Command {
     public static ChassisSubsystem chassisSubsystem = new ChassisSubsystem();
     public static ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     public static ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+    public static TurretSubsystem turretSubsystem = new TurretSubsystem();
+    public static BridgeTipSubsystem bridgeTipSubsystem = new BridgeTipSubsystem();
     
     public static void init() {
         // This MUST be here. If the OI creates Commands (which it very likely
@@ -33,6 +33,8 @@ public abstract class CommandBase extends Command {
         SmartDashboard.putData(chassisSubsystem);
         SmartDashboard.putData(shooterSubsystem);
         SmartDashboard.putData(elevatorSubsystem);
+        SmartDashboard.putData(turretSubsystem);
+        SmartDashboard.putData(bridgeTipSubsystem);
     }
 
     public CommandBase(String name) {

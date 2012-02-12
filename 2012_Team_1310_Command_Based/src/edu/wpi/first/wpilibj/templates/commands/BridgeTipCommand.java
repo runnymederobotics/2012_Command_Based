@@ -8,10 +8,11 @@ package edu.wpi.first.wpilibj.templates.commands;
  *
  * @author Teacher
  */
-public class CollectBallCommand extends CommandBase {    
-    public CollectBallCommand() {
+public class BridgeTipCommand extends CommandBase {
+    
+    public BridgeTipCommand() {
         // Use requires() here to declare subsystem dependencies
-        requires(elevatorSubsystem);
+        requires(bridgeTipSubsystem);
     }
 
     // Called just before this Command runs the first time
@@ -20,9 +21,7 @@ public class CollectBallCommand extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        elevatorSubsystem.updateBallStatus();
-        
-        elevatorSubsystem.runRoller(!elevatorSubsystem.hasMaxBalls());
+        bridgeTipSubsystem.set(oi.getBridgeTipperToggle());
     }
 
     // Make this return true when this Command no longer needs to run execute()

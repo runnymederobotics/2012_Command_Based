@@ -25,9 +25,9 @@ import edu.wpi.first.wpilibj.templates.commands.*;
  */
 public class RobotTemplate extends IterativeRobot {
     
-    Compressor compressor;
+    Compressor compressor = new Compressor(RobotMap.COMPRESSOR_DI, 1);
     
-    SendableChooser autonomousChooser;
+    SendableChooser autonomousChooser = new SendableChooser();
     
     Command autonomousCommand;
     
@@ -43,10 +43,8 @@ public class RobotTemplate extends IterativeRobot {
         // Initialize all subsystems
         CommandBase.init();
         
-        compressor = new Compressor(RobotMap.COMPRESSOR_DI, 1); 
         compressor.start();
-        
-        autonomousChooser = new SendableChooser();
+
         autonomousChooser.addDefault("Nothing", DriveDistanceCommand.creator(0));
         autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip", ShootTipCommandGroup.creator());
@@ -55,11 +53,28 @@ public class RobotTemplate extends IterativeRobot {
         SmartDashboard.putData("Autonomous", autonomousChooser);
     }
     
+    private void enableSubsystems() {
+        CommandBase.chassisSubsystem.enable();
+        CommandBase.elevatorSubsystem.enable();
+        CommandBase.shooterSubsystem.enable();
+        CommandBase.turretSubsystem.enable();
+    }
+    
+    private void disableSubsystems() {
+        CommandBase.chassisSubsystem.disable();
+        CommandBase.elevatorSubsystem.disable();
+        CommandBase.shooterSubsystem.disable();
+        CommandBase.turretSubsystem.disable();
+    }
+    
     //Called when disabled mode is entered
     public void disabledInit() {
+        disableSubsystems();
     }
     //Called when autonomous mode is entered
     public void autonomousInit() {
+        enableSubsystems();
+        
         CommandCreator creator = (CommandCreator)autonomousChooser.getSelected();
         autonomousCommand = creator.create();
         System.out.println("autonomousInit starting " + autonomousCommand);
@@ -70,11 +85,12 @@ public class RobotTemplate extends IterativeRobot {
         if(autonomousCommand != null) {
             autonomousCommand.cancel();
         }
+        
+        enableSubsystems();
     }
 
     //This function is called periodically when disabled
     public void disabledPeriodic() {
-        //print("Disabled");
     }
     //This function is called periodically during autonomous
     public void autonomousPeriodic() {
@@ -88,27 +104,27 @@ public class RobotTemplate extends IterativeRobot {
     }
     
     //Custom print function
-    final double PRINT_DELAY = 0.125;
+    final double PRINT_DELAY = 0.25;
     double lastPrintTime = 0.0;
     public void print(String mode) {
         final double now = Timer.getFPGATimestamp();
         if(now - lastPrintTime > PRINT_DELAY) {
             lastPrintTime = now;
             
-            //A bunch of new lines
-            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-
-            System.out.println("[" + mode + "]");
+            System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+            System.out.print("[" + mode + "]");
             
             CommandBase.chassisSubsystem.print();
-            
-            System.out.println();
-            
+            System.out.print("\n");
             CommandBase.elevatorSubsystem.print();
-            
-            System.out.println();
-            
+            System.out.print("\n");
             CommandBase.shooterSubsystem.print();
+            System.out.print("\n");
+            CommandBase.turretSubsystem.print();
+            System.out.print("\n");
+            CommandBase.oi.print();
+
+            System.out.flush();
         }
     }
 }

@@ -9,23 +9,32 @@ package edu.wpi.first.wpilibj.templates;
 public class RobotMap {
     // For example to map the left and right motors, you could define the
     // following variables to use with your drivetrain subsystem.
-    public static final int LEFT_MOTOR = 1;
-    public static final int RIGHT_MOTOR = 2;
+    public static final int LEFT_MOTOR = 2;
+    public static final int RIGHT_MOTOR = 1;
     public static final int SHOOTER_MOTOR = 3;
     public static final int ROLLER_MOTOR = 4;
-    public static final int CAMERA_SERVO = 6;
+    public static final int TURRET_MOTOR = 5;
     
     public static final int TRANS_SHIFT_FORWARD = 1;
     public static final int TRANS_SHIFT_REVERSE = 2;
+    public static final int BRIDGE_TIPPER_ONE = 5;
+    public static final int BRIDGE_TIPPER_TWO = 6;
+    public static final int ELEVATOR_BALL_RELEASE_ONE= 3;
+    public static final int ELEVATOR_BALL_RELEASE_TWO = 4;
     
-    public static final int ENC_LEFT_A = 3;
-    public static final int ENC_LEFT_B = 4;
-    public static final int ENC_RIGHT_A = 1;
-    public static final int ENC_RIGHT_B = 2;
-    public static final int ENC_SHOOTER_A = 7;
-    public static final int ENC_SHOOTER_B = 8;
-    public static final int BALL_ENTER_SWITCH = 9;
-    public static final int BALL_EXIT_SWITCH = 11;
+    public static final int ENC_LEFT_A = 5;
+    public static final int ENC_LEFT_B = 6;
+    public static final int ENC_RIGHT_A = 3;
+    public static final int ENC_RIGHT_B = 4;
+    public static final int ENC_SHOOTER_A = 11;
+    public static final int ENC_SHOOTER_B = 12;
+    public static final int ENC_TURRET_A = 7;
+    public static final int ENC_TURRET_B = 8;
+    public static final int TOP_BALL = 13;
+    public static final int MIDDLE_BALL = 9;
+    public static final int BOTTOM_BALL = 14;
+    public static final int TURRET_LEFT_LIMIT = 1;
+    public static final int TURRET_RIGHT_LIMIT = 2;
     public static final int COMPRESSOR_DI = 10;
     
     public static final int GYRO_XY = 2;

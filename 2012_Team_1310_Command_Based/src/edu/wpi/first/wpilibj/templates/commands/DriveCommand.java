@@ -3,7 +3,6 @@ package edu.wpi.first.wpilibj.templates.commands;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 public class DriveCommand extends CommandBase {
-
     public DriveCommand() {
         requires(chassisSubsystem);
     }
@@ -21,11 +20,6 @@ public class DriveCommand extends CommandBase {
         } else if(oi.getHighGearButton()) {
             chassisSubsystem.transShift(true);
             allowTransShift = false;
-        }
-        
-        if(oi.getFollowTargetToggle()) {
-            //Follow target takes over this command because it requires(chassisSubsystem)
-            Scheduler.getInstance().add(new FollowTargetCommand());
         }
         
         if(oi.getAutoBalanceToggle()) {

@@ -32,7 +32,7 @@ public class ChassisSubsystem extends Subsystem {
     final double PID_COUNT_MAX_OUTPUT = 0.25;
     final double PID_GYRO_MAX_OUTPUT = 0.25;
     
-    final double PID_P = 0.0, PID_I = 0.0001, PID_D = 0.0;
+    final double PID_P = 0.0, PID_I = 0.0003, PID_D = 0.0;
     final double PID_GYRO_P = 0.001, PID_GYRO_I = 0.0, PID_GYRO_D = 0.0;
     final double PID_COUNT_P = 0.05, PID_COUNT_I = 0.0, PID_COUNT_D = 0.0;
     
@@ -98,6 +98,28 @@ public class ChassisSubsystem extends Subsystem {
         SmartDashboard.putData("PIDGyro", pidGyro);
         SmartDashboard.putData("PIDLeftCount", pidLeftCount);
         SmartDashboard.putData("PIDRightCount", pidRightCount);
+    }
+    
+    private void reset() {
+        encLeft.reset();
+        encRight.reset();
+        
+        gyroXY.reset();
+        gyroYZ.reset();
+    }
+    
+    public void disable() {
+        reset();
+        
+        disablePID();
+        disablePIDCount();
+        disablePIDGyro();
+    }
+    
+    public void enable() {
+        reset();
+        
+        enablePID();
     }
     
     public void initDefaultCommand() {
@@ -245,18 +267,18 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void print() {
-        System.out.println("(Chassis Subsystem)");
+        System.out.print("(Chassis Subsystem)\n");
         
-        System.out.println("PIDLeftCount output: " + pidLeftCount.get() + " PIDRightCount output: " + pidRightCount.get());
-        System.out.println("PIDLeftCount setpoint: " + pidLeftCount.getSetpoint() + " PIDRightCount setpoint: " + pidRightCount.getSetpoint());
-        System.out.println("EncLeftCount: " + encLeftCount.pidGet() + " EncRightCount: " + encRightCount.pidGet());
-        System.out.println("PIDLeftCount storage: " + pidLeftCountStorage.get() + " PIDRightCount storage: " + pidRightCountStorage.get());
-        System.out.println("PIDEnabled: " + (pidLeft.isEnable() && pidRight.isEnable()));
+        System.out.print("PIDLeftCount output: " + pidLeftCount.get() + " PIDRightCount output: " + pidRightCount.get() + "\n");
+        System.out.print("PIDLeftCount setpoint: " + pidLeftCount.getSetpoint() + " PIDRightCount setpoint: " + pidRightCount.getSetpoint() + "\n");
+        System.out.print("EncLeftCount: " + encLeftCount.pidGet() + " EncRightCount: " + encRightCount.pidGet() + "\n");
+        System.out.print("PIDLeftCount storage: " + pidLeftCountStorage.get() + " PIDRightCount storage: " + pidRightCountStorage.get() + "\n");
+        System.out.print("PIDEnabled: " + (pidLeft.isEnable() && pidRight.isEnable()) + "\n");
         
-        System.out.println("OI Drive axis: " + CommandBase.oi.getSpeedAxis() + " OI Rotation Axis: " + CommandBase.oi.getRotationAxis());
+        System.out.print("OI Drive axis: " + CommandBase.oi.getSpeedAxis() + " OI Rotation Axis: " + CommandBase.oi.getRotationAxis() + "\n");
         
-        System.out.println("PIDLeft output: " + pidLeft.get() + " PIDRight output: " + pidRight.get());
-        System.out.println("PIDLeft setpoint: " + pidLeft.getSetpoint() + " PIDRight setpoint: " + pidRight.getSetpoint());
-        System.out.println("EncLeftRate: " + encLeft.getRate() + " EncRightRate: " + encRight.getRate());
+        System.out.print("PIDLeft output: " + pidLeft.get() + " PIDRight output: " + pidRight.get() + "\n");
+        System.out.print("PIDLeft setpoint: " + pidLeft.getSetpoint() + " PIDRight setpoint: " + pidRight.getSetpoint() + "\n");
+        System.out.print("EncLeftRate: " + encLeft.getRate() + " EncRightRate: " + encRight.getRate() + "\n");
     }
 }

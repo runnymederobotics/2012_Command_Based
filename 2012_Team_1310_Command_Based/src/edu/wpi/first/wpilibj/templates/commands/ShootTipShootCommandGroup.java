@@ -7,7 +7,10 @@ import edu.wpi.first.wpilibj.templates.RobotTemplate;
 public class ShootTipShootCommandGroup extends CommandGroup {
     
     public ShootTipShootCommandGroup() {
-        //addSequential(new Command());
+        //addSequential(new AutonomousShootCommand());
+        addSequential(new DriveDistanceCommand(-1000)); //Drive backwards
+        addSequential(new RotateCommand(180)); //Rotate to face the bridge
+        addSequential(new BridgeTipCommand()); //Tip the bridge
     }
     
     static class Creator implements RobotTemplate.CommandCreator {

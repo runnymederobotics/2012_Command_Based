@@ -6,17 +6,13 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.RobotMap;
-import edu.wpi.first.wpilibj.templates.commands.DistanceShooterCommand;
+import edu.wpi.first.wpilibj.templates.commands.ShooterCommand;
 
 public class ShooterSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
     final int MAX_SHOOTER_ENCODER_RATE = 15000;
-    final double MAX_SHOOTER_DISTANCE = 500; //5 metres
-    
-    final double MIN_SHOOTER_RANGE = MAX_SHOOTER_ENCODER_RATE * 0.5;
-    final double MAX_SHOOTER_RANGE = MAX_SHOOTER_ENCODER_RATE * 0.9;
     
     Victor shooterMotor = new Victor(RobotMap.SHOOTER_MOTOR);
     
@@ -28,16 +24,32 @@ public class ShooterSubsystem extends Subsystem {
         encShooter.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encShooter.start();
         
-        pidShooter.setInputRange(0.0, MAX_SHOOTER_ENCODER_RATE);
-        pidShooter.setOutputRange(0.0, 1.0);
+        pidShooter.setInputRange(-MAX_SHOOTER_ENCODER_RATE, MAX_SHOOTER_ENCODER_RATE);
+        pidShooter.setOutputRange(-1.0, 1.0);
         SmartDashboard.putData("PIDShooter", pidShooter);
+        
+        enablePID();
+    }
+    
+    public void reset() {
+        encShooter.reset();
+    }
+    
+    public void disable() {
+        reset();
+        
+        disablePID();
+    }
+    
+    public void enable() {
+        reset();
         
         enablePID();
     }
     
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        setDefaultCommand(new DistanceShooterCommand());
+        setDefaultCommand(new ShooterCommand());
     }
     
     private void enablePID() {
@@ -52,15 +64,21 @@ public class ShooterSubsystem extends Subsystem {
         }
     }
     
+    public boolean getShooterRunning() {
+        return shooterMotor.get() != 0.0;
+    }
+    
     public void setSetpoint(double rate) {
-        //shooterMotor.set(rate);
-        
-        pidShooter.setSetpoint(rate * MAX_SHOOTER_ENCODER_RATE);
+        if(pidShooter.isEnable()) {
+            pidShooter.setSetpoint(-rate * MAX_SHOOTER_ENCODER_RATE);
+        } else {
+            shooterMotor.set(rate);
+        }
     }
     
     public void print() {
-        System.out.println("(Shooter Subsystem)");
+        System.out.print("(Shooter Subsystem)\n");
         
-        System.out.println("PIDShooter output: " + pidShooter.get() + " PIDShooter setpoint: " + pidShooter.getSetpoint() + " + EncShooter: " + encShooter.getRate());
+        System.out.print("PIDShooter output: " + pidShooter.get() + " PIDShooter setpoint: " + pidShooter.getSetpoint() + " + EncShooter: " + encShooter.getRate() + "\n");
     }
 }

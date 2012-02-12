@@ -1,33 +1,28 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
-import edu.wpi.first.wpilibj.templates.CameraSystem;
-
-public class DistanceShooterCommand extends CommandBase {
-    double[] targetDistance = new double[1];
-    boolean[] freshSequence = new boolean[1];
-    
-    int[] readerSequenceNumber = new int[1];
-    
-    public DistanceShooterCommand() {
+public class ElevatorCommand extends CommandBase {
+    public ElevatorCommand() {
         // Use requires() here to declare subsystem dependencies
-        requires(shooterSubsystem);
+        requires(elevatorSubsystem);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
     }
 
+    boolean releasingBall = false;
+    
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        double speed = -oi.getSliderAxis() / 2 + 0.5;
-        shooterSubsystem.setSetpoint(speed);
+        elevatorSubsystem.handleBallRelease(oi.getBallRelease(), shooterSubsystem.getShooterRunning());
         
-        //Do something to convert targetDistance to a motor speed
+        if(oi.getManualRollerToggle()) {
+            elevatorSubsystem.runRoller(oi.getRollerSpeed());
+        } else {
+            elevatorSubsystem.runRoller(0.0); //Only run the roller positive
+        }
         
-        /*boolean canSeeTarget = CameraSystem.getTargetDistance(readerSequenceNumber, targetDistance, freshSequence);
-        if(canSeeTarget && freshSequence[0]) {
-            shooterSubsystem.setSetpoint(0.0);
-        }*/
+        //elevatorSubsystem.runRoller(!elevatorSubsystem.hasMaxBalls());
     }
 
     // Make this return true when this Command no longer needs to run execute()
