@@ -1,34 +1,23 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
-import edu.wpi.first.wpilibj.DriverStation;
-
-public class ElevatorCommand extends CommandBase {
-    
-    public ElevatorCommand() {
+public class BridgeTipDownCommand extends CommandBase {
+    public BridgeTipDownCommand() {
         // Use requires() here to declare subsystem dependencies
-        requires(elevatorSubsystem);
+        requires(bridgeTipSubsystem);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
     }
 
-    boolean releasingBall = false;
-    
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        if(oi.getEnableElevatorToggle()) {
-            elevatorSubsystem.runRoller(oi.getBallRelease());
-        } else {
-            elevatorSubsystem.disable();
-        }
-        
-        elevatorSubsystem.handleBallRelease(oi.getBallRelease(), shooterSubsystem.getShooterRunning());
+        bridgeTipSubsystem.set(true);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return bridgeTipSubsystem.get();
     }
 
     // Called once after isFinished returns true

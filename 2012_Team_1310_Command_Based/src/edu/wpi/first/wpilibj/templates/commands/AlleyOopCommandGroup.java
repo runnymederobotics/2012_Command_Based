@@ -7,7 +7,13 @@ import edu.wpi.first.wpilibj.templates.RobotTemplate;
 public class AlleyOopCommandGroup extends CommandGroup {
     
     public AlleyOopCommandGroup() {
+        //Default Commands
+        //Contantly run the shooter
+        //Constantly track the target
+        //Constantly run the elevator, never requesting a shot
+        
         addSequential(new DriveDistanceCommand(1000));
+        addSequential(new AutonomousShootCommand());
         addSequential(new DriveDistanceCommand(-1000));
     }
     

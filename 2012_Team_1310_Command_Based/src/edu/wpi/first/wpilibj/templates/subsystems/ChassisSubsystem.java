@@ -2,8 +2,8 @@ package edu.wpi.first.wpilibj.templates.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableGyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
@@ -21,7 +21,6 @@ public class ChassisSubsystem extends Subsystem {
     
     final int MAX_LOW_ENCODER_RATE = 800;
     final int MAX_HIGH_ENCODER_RATE = 1900;
-    final double AUTO_TRANS_THRESHOLD = 0.6;
     
     final double PID_COUNT_TOLERANCE = 10; //Counts
     final double PID_GYRO_TOLERANCE = 1; //Degrees
@@ -36,8 +35,8 @@ public class ChassisSubsystem extends Subsystem {
     final double PID_GYRO_P = 0.001, PID_GYRO_I = 0.0, PID_GYRO_D = 0.0;
     final double PID_COUNT_P = 0.05, PID_COUNT_I = 0.0, PID_COUNT_D = 0.0;
     
-    Victor motorLeft = new Victor(RobotMap.LEFT_MOTOR);
-    Victor motorRight = new Victor(RobotMap.RIGHT_MOTOR);
+    Jaguar motorLeft = new Jaguar(RobotMap.LEFT_MOTOR);
+    Jaguar motorRight = new Jaguar(RobotMap.RIGHT_MOTOR);
     
     OutputStorage storageLeft = new OutputStorage();
     OutputStorage storageRight = new OutputStorage();

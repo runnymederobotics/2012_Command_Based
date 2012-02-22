@@ -71,7 +71,7 @@ public class AutoBalanceCommand extends CommandBase {
         case AutoBalanceState.INCLINE_BACKWARDS: {
                 if(gyroAngle < HORIZONTAL_TOLERANCE && gyroAngle > -HORIZONTAL_TOLERANCE) {
                     stateChangeTime = Timer.getFPGATimestamp(); //The time we changed
-                    speed = -speed * 1.5; //Reverse speed for "kickback"
+                    speed *= -1.5; //Reverse speed for "kickback"
                     curState = AutoBalanceState.HORIZONTAL;
                     break;
                 }

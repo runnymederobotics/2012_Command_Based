@@ -21,25 +21,14 @@ public class ShooterCommand extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         //Manual mode
-        
-        if(oi.getManualShooterToggle()) {
-            double manualSpeed = oi.getShooterSpeed();
+        if(DriverStation.getInstance().isOperatorControl() && oi.getManualShooterToggle()) {
+            double manualSpeed = oi.getManualShooterSpeed();
             shooterSubsystem.setSetpoint(manualSpeed);
         } else {
-            //shooterSubsystem.setSetpoint(0.0);
-            //Do something to convert targetDistance to a motor speed
-
             boolean canSeeTarget = CameraSystem.getTargetDistance(readerSequenceNumber, targetDistance, freshSequence);
             
-            final double minPower = DriverStation.getInstance().getAnalogIn(1) / 5.0; //0.2794
-            double powerDivisor = DriverStation.getInstance().getAnalogIn(2) * 1000; //1816
-            if(powerDivisor <= 0) {
-                powerDivisor = 1500;
-            }
-            double motorSpeed = targetDistance[0] / powerDivisor + minPower;
-            
             if(canSeeTarget && freshSequence[0]) {
-                shooterSubsystem.setSetpoint(motorSpeed);
+                shooterSubsystem.setSetpoint(shooterSubsystem.getPowerFromDistance(targetDistance[0]));
             }
         }
     }

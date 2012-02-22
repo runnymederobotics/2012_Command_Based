@@ -1,16 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.templates.commands;
 
-/**
- *
- * @author Teacher
- */
-public class BridgeTipCommand extends CommandBase {
-    
-    public BridgeTipCommand() {
+import edu.wpi.first.wpilibj.DriverStation;
+
+public class ManualBridgeTipCommand extends CommandBase {
+    public ManualBridgeTipCommand() {
         // Use requires() here to declare subsystem dependencies
         requires(bridgeTipSubsystem);
     }
@@ -21,7 +14,9 @@ public class BridgeTipCommand extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        bridgeTipSubsystem.set(oi.getBridgeTipperToggle());
+        if(DriverStation.getInstance().isOperatorControl()) {
+            bridgeTipSubsystem.set(oi.getBridgeTipperToggle());
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()

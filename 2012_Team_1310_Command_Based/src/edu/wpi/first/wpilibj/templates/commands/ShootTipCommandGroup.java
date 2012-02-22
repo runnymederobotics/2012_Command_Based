@@ -17,6 +17,6 @@ public class ShootTipCommandGroup extends CommandGroup {
     }
     
     public ShootTipCommandGroup() {
-        //addSequential(new Command());
+        //addSequential(new BridgeTipDownCommand());
     }
 }

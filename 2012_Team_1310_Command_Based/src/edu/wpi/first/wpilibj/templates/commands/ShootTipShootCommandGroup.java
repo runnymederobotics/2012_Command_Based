@@ -10,7 +10,7 @@ public class ShootTipShootCommandGroup extends CommandGroup {
         //addSequential(new AutonomousShootCommand());
         addSequential(new DriveDistanceCommand(-1000)); //Drive backwards
         addSequential(new RotateCommand(180)); //Rotate to face the bridge
-        addSequential(new BridgeTipCommand()); //Tip the bridge
+        addSequential(new BridgeTipDownCommand()); //Tip the bridge
     }
     
     static class Creator implements RobotTemplate.CommandCreator {

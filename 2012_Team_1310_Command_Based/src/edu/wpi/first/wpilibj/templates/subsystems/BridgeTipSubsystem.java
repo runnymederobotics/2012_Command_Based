@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.templates.Pneumatic;
 import edu.wpi.first.wpilibj.templates.RobotMap;
-import edu.wpi.first.wpilibj.templates.commands.BridgeTipCommand;
+import edu.wpi.first.wpilibj.templates.commands.ManualBridgeTipCommand;
 
 public class BridgeTipSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
@@ -14,11 +14,15 @@ public class BridgeTipSubsystem extends Subsystem {
     
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        setDefaultCommand(new BridgeTipCommand());
+        setDefaultCommand(new ManualBridgeTipCommand());
     }
     
     public void set(boolean value) {
         bridgeTipperPneumatic.set(value);
+    }
+    
+    public boolean get() {
+        return bridgeTipperPneumatic.get();
     }
     
     public void print() {

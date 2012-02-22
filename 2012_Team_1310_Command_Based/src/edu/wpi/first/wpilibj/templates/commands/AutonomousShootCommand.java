@@ -1,10 +1,8 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
-import edu.wpi.first.wpilibj.DriverStation;
-
-public class ElevatorCommand extends CommandBase {
+public class AutonomousShootCommand extends CommandBase {
     
-    public ElevatorCommand() {
+    public AutonomousShootCommand() {
         // Use requires() here to declare subsystem dependencies
         requires(elevatorSubsystem);
     }
@@ -13,22 +11,17 @@ public class ElevatorCommand extends CommandBase {
     protected void initialize() {
     }
 
-    boolean releasingBall = false;
-    
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        if(oi.getEnableElevatorToggle()) {
-            elevatorSubsystem.runRoller(oi.getBallRelease());
-        } else {
-            elevatorSubsystem.disable();
-        }
+        boolean shootRequest = true;
         
-        elevatorSubsystem.handleBallRelease(oi.getBallRelease(), shooterSubsystem.getShooterRunning());
+        elevatorSubsystem.runRoller(shootRequest);
+        elevatorSubsystem.handleBallRelease(shootRequest, shooterSubsystem.getShooterRunning());
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return !elevatorSubsystem.hasBalls(); //Finish when we no longer have balls
     }
 
     // Called once after isFinished returns true

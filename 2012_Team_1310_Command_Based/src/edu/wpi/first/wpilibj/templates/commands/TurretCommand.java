@@ -3,7 +3,8 @@ package edu.wpi.first.wpilibj.templates.commands;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.templates.CameraSystem;
 
-public class TurretCommand extends CommandBase {  
+public class TurretCommand extends CommandBase {
+    final double TURRET_SPEED = 0.7;
     final double CAMERA_TOLERANCE = 0.5; //Degrees
     
     double[] targetAngle = new double[1];
@@ -23,7 +24,7 @@ public class TurretCommand extends CommandBase {
     protected void execute() {
         if(DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle()) {
             turretSubsystem.disablePID();
-            turretSubsystem.setSpeed(oi.getTurretSpeed());
+            turretSubsystem.setSpeed(TURRET_SPEED * oi.getManualTurretDirection());
         } else {
             turretSubsystem.enablePID();
             
@@ -35,7 +36,7 @@ public class TurretCommand extends CommandBase {
                 //Do nothing
             } else if(!canSeeTarget && freshSequence[0]) {
                 //TODO: get EP to get their shit together and put DigitalInputs on the turret
-                //turretSubsystem.searchForTarget();
+                //turretSubsystem.searchForTarget(oi.getManualTurretDirection());
             }
         }
     }

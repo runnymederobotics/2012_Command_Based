@@ -2,8 +2,8 @@ package edu.wpi.first.wpilibj.templates.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.templates.Pneumatic;
 import edu.wpi.first.wpilibj.templates.RobotMap;
@@ -14,11 +14,12 @@ public class ElevatorSubsystem extends Subsystem {
     // here. Call these from Commands.
     
     final int MAX_BALLS = 3;
-    final double RELEASE_DELAY = 0.5;
-    final double RECOVER_TIME = 0.5; //Time for shooter to recover after a shot
+    final double ELEVATOR_SPEED = 1.0;
+    final double RELEASE_DELAY = 0.35;
+    final double RECOVER_TIME = 0.75; //Time for shooter to recover after a shot
     final boolean RELEASE_VALUE = true;
     
-    Victor rollerMotor = new Victor(RobotMap.ROLLER_MOTOR);
+    Jaguar elevatorMotor = new Jaguar(RobotMap.ELEVATOR_MOTOR);
     
     DigitalInput topBall = new DigitalInput(RobotMap.TOP_BALL);
     DigitalInput middleBall = new DigitalInput(RobotMap.MIDDLE_BALL);
@@ -30,6 +31,7 @@ public class ElevatorSubsystem extends Subsystem {
     }
     
     public void disable() {
+        elevatorMotor.set(0.0);
     }
     
     public void enable() {
@@ -40,16 +42,17 @@ public class ElevatorSubsystem extends Subsystem {
         setDefaultCommand(new ElevatorCommand());
     }
     
-    public boolean getTopBall() {
-        return topBall.get();
+    public boolean hasMaxBalls() {
+        return false;
+        //return topBall.get() && middleBall.get() && bottomBall.get();
     }
     
-    public int getBallCount() {
-        return (topBall.get() ? 1 : 0) + (middleBall.get() ? 1 : 0) + (bottomBall.get() ? 1 : 0);
+    public boolean hasBalls() {
+        return topBall.get() || middleBall.get() || bottomBall.get();
     }
     
     public boolean elevatorRunning() {
-        return rollerMotor.get() != 0.0;
+        return elevatorMotor.get() != 0.0;
     }
     
     boolean releasingBall = false;
@@ -78,18 +81,18 @@ public class ElevatorSubsystem extends Subsystem {
         }
     }
     
-    public void keepBall() {
-        
-    }
-    
-    public void runRoller(double speed) {
-        rollerMotor.set(speed);
+    public void runRoller(boolean shootRequest) {
+        if(hasMaxBalls() && !shootRequest) {
+            elevatorMotor.set(0.0);
+        } else {
+            elevatorMotor.set(ELEVATOR_SPEED);
+        }
     }
     
     public void print() {
         System.out.print("(Elevator Subsystem)\n");
         
         System.out.print("topBall: " + topBall.get() + " middleBall: " + middleBall.get() + " bottomBall: " + bottomBall.get() + "\n");
-        System.out.print("rollerMotor: " + rollerMotor.get() + "\n");
+        System.out.print("elevatorMotor: " + elevatorMotor.get() + "\n");
     }
 }

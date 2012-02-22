@@ -111,8 +111,8 @@ public class RobotTemplate extends IterativeRobot {
         if(now - lastPrintTime > PRINT_DELAY) {
             lastPrintTime = now;
             
-            System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-            System.out.print("[" + mode + "]");
+            //System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+            System.out.print("[" + mode + "]\n");
             
             CommandBase.chassisSubsystem.print();
             System.out.print("\n");
@@ -123,7 +123,8 @@ public class RobotTemplate extends IterativeRobot {
             CommandBase.turretSubsystem.print();
             System.out.print("\n");
             CommandBase.oi.print();
-
+            System.out.print("\n");
+            
             System.out.flush();
         }
     }

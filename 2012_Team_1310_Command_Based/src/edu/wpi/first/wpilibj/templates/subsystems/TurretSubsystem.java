@@ -2,7 +2,7 @@ package edu.wpi.first.wpilibj.templates.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.templates.RobotMap;
 import edu.wpi.first.wpilibj.templates.commands.TurretCommand;
@@ -11,12 +11,12 @@ public class TurretSubsystem extends PIDSubsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
-    static final double PID_P = 0.005, PID_I = 0.0, PID_D = 0.0;
+    static final double PID_P = 0.0025, PID_I = 0.0, PID_D = 0.0;
     final double COUNTS_PER_DEGREE = 13; //We turned the turret 90 degrees and divided the encoder counts by 90
     final double MAX_SPEED = 1.0;
     final double SEARCH_ANGULAR_VELOCITY = 1.0; //Degrees
     
-    Victor turretMotor = new Victor(RobotMap.TURRET_MOTOR);
+    Jaguar turretMotor = new Jaguar(RobotMap.TURRET_MOTOR);
     
     Encoder encTurret = new Encoder(RobotMap.ENC_TURRET_A, RobotMap.ENC_TURRET_B);
     
@@ -69,12 +69,42 @@ public class TurretSubsystem extends PIDSubsystem {
     }
     
     public void setSpeed(double speed) {
+        if(Math.abs(speed - SEARCH_RIGHT) < Math.abs(speed - SEARCH_LEFT)) {
+            //Difference from searching right is less than difference from searching left
+            //This means we are moving right
+            if(rightLimit.get()) {
+                speed = 0;
+            }
+        } else {
+            //We are moving left
+            if(leftLimit.get()) {
+                speed = 0;
+            }
+        }
+        
         turretMotor.set(speed);
-        //TODO: add digital inputs for limit switches
     }
     
-    public void searchForTarget() {
-        //TODO: search for target
+    public static final int SEARCH_RIGHT = 1;
+    public static final int SEARCH_LEFT = -1;
+    
+    public void searchForTarget(int requestedDirection) {
+        boolean requestingDirection = requestedDirection != 0;
+        if(requestingDirection) {
+            searchDirection = requestedDirection;
+            if(searchDirection == SEARCH_LEFT && leftLimit.get()) {
+                searchDirection = 0;
+            } else if(searchDirection == SEARCH_RIGHT && rightLimit.get()) {
+                searchDirection = 0;
+            }
+        } else {
+            if(leftLimit.get()) {
+                searchDirection = SEARCH_RIGHT;
+            } else if(rightLimit.get()) {
+                searchDirection = SEARCH_LEFT;
+            }
+        }
+        
         if(usePID) {
             setRelativeAngleSetpoint(searchDirection);
         }
