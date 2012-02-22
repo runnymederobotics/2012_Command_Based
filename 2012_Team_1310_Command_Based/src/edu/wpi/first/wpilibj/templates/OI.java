@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj.templates;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.templates.subsystems.TurretSubsystem;
 
 public class OI {
     // Process operator interface input here.
@@ -102,9 +103,9 @@ public class OI {
     
     public int getManualTurretDirection() {
         if(stickOperator.getRawButton(OPERATOR_TURRET_LEFT_BUTTON)) {
-            return -1;
+            return TurretSubsystem.SEARCH_LEFT;
         } else if(stickOperator.getRawButton(OPERATOR_TURRET_RIGHT_BUTTON)) {
-            return 1;
+            return TurretSubsystem.SEARCH_RIGHT;
         }
         
         return 0;
