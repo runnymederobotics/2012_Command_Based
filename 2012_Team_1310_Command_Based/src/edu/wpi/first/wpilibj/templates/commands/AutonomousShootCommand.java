@@ -14,8 +14,9 @@ public class AutonomousShootCommand extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         boolean shootRequest = true;
+        boolean disableRequest = false;
         
-        elevatorSubsystem.runRoller(shootRequest);
+        elevatorSubsystem.runRoller(disableRequest, shootRequest);
         elevatorSubsystem.handleBallRelease(shootRequest, shooterSubsystem.getShooterRunning());
     }
 

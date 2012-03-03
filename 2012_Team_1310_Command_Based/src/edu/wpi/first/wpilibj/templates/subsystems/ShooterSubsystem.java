@@ -132,7 +132,7 @@ public class ShooterSubsystem extends Subsystem {
     
     public void setSetpoint(double rate) {
         if(pidShooter.isEnable()) {
-            pidShooter.setSetpoint(-rate * MAX_SHOOTER_ENCODER_RATE);
+            pidShooter.setSetpoint(rate * MAX_SHOOTER_ENCODER_RATE);
         } else {
             shooterMotor.set(rate);
         }

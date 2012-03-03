@@ -91,16 +91,27 @@ public class RobotTemplate extends IterativeRobot {
 
     //This function is called periodically when disabled
     public void disabledPeriodic() {
+        CommandBase.elevatorSubsystem.updateDashboard();
+        print("Disabled");
     }
     //This function is called periodically during autonomous
     public void autonomousPeriodic() {
-        Scheduler.getInstance().run();
         print("Autonomous");
+        Scheduler.getInstance().run();
     }
     //This function is called periodically during operator control
     public void teleopPeriodic() {
-        Scheduler.getInstance().run();
         print("Teleoperated");
+        Scheduler.getInstance().run();
+    }
+    
+    public void disabledContinuous() {
+    }
+    
+    public void autonomousContinuous() {
+    }
+    
+    public void teleopContinuous() {
     }
     
     //Custom print function
@@ -121,6 +132,7 @@ public class RobotTemplate extends IterativeRobot {
             CommandBase.shooterSubsystem.print();
             System.out.print("\n");
             CommandBase.turretSubsystem.print();
+            //TurretCommand.print();
             System.out.print("\n");
             CommandBase.oi.print();
             System.out.print("\n");
