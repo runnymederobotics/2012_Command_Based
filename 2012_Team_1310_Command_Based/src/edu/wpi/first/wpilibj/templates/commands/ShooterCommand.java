@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.templates.CameraSystem;
 
 public class ShooterCommand extends CommandBase {
+    final double IDLE_SPEED = 0.15;
+    
     double[] targetDistance = new double[1];
     boolean[] freshSequence = new boolean[1];
     
@@ -20,16 +22,19 @@ public class ShooterCommand extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        //Manual mode
-        if(DriverStation.getInstance().isOperatorControl() && oi.getManualShooterToggle()) {
-            double manualSpeed = oi.getManualShooterSpeed();
-            shooterSubsystem.setSetpoint(manualSpeed);
-        } else {
-            boolean canSeeTarget = CameraSystem.getTargetDistance(readerSequenceNumber, targetDistance, freshSequence);
-            
-            if(canSeeTarget && freshSequence[0]) {
-                shooterSubsystem.setSetpoint(shooterSubsystem.getPowerFromDistance(targetDistance[0]));
+        if(elevatorSubsystem.hasBalls()) {
+            if(DriverStation.getInstance().isOperatorControl() && oi.getManualShooterToggle()) {
+                double manualSpeed = oi.getManualShooterSpeed();
+                shooterSubsystem.setSetpoint(manualSpeed);
+            } else {
+                boolean canSeeTarget = CameraSystem.getTargetDistance(readerSequenceNumber, targetDistance, freshSequence);
+
+                if(canSeeTarget && freshSequence[0]) {
+                    shooterSubsystem.setSetpoint(shooterSubsystem.getPowerFromDistance(targetDistance[0]));
+                }
             }
+        } else {
+            shooterSubsystem.setSetpoint(IDLE_SPEED);
         }
     }
 

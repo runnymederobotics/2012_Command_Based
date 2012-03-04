@@ -13,7 +13,7 @@ public class RobotMap {
     public static final int RIGHT_MOTOR = 1;
     public static final int SHOOTER_MOTOR = 3;
     public static final int ELEVATOR_MOTOR = 4;
-    public static final int TURRET_MOTOR = 5;
+    public static final int TURRET_MOTOR = 6;
     
     public static final int TRANS_SHIFT_FORWARD = 1;
     public static final int TRANS_SHIFT_REVERSE = 2;
@@ -26,16 +26,16 @@ public class RobotMap {
     public static final int ENC_LEFT_B = 6;
     public static final int ENC_RIGHT_A = 3;
     public static final int ENC_RIGHT_B = 4;
-    public static final int ENC_SHOOTER_A = 11;
-    public static final int ENC_SHOOTER_B = 12;
+    public static final int ENC_SHOOTER_A = 10;
+    public static final int ENC_SHOOTER_B = 11;
     public static final int ENC_TURRET_A = 7;
     public static final int ENC_TURRET_B = 8;
-    public static final int TOP_BALL = 13;
-    public static final int MIDDLE_BALL = 9;
-    public static final int BOTTOM_BALL = 14;
+    public static final int TOP_BALL = 14;
+    public static final int MIDDLE_BALL = 13;
+    public static final int BOTTOM_BALL = 12;
     public static final int TURRET_LEFT_LIMIT = 1;
     public static final int TURRET_RIGHT_LIMIT = 2;
-    public static final int COMPRESSOR_DI = 10;
+    public static final int COMPRESSOR_DI = 9;
     
     public static final int GYRO_XY = 2;
     public static final int GYRO_YZ = 1;

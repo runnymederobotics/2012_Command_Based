@@ -14,7 +14,7 @@ public class ElevatorSubsystem extends Subsystem {
     // here. Call these from Commands.
     
     final int MAX_BALLS = 3;
-    final double ELEVATOR_SPEED = 1.0;
+    final double ELEVATOR_SPEED = 0.5;
     final double RELEASE_DELAY = 0.35;
     final double RECOVER_TIME = 0.75; //Time for shooter to recover after a shot
     final boolean RELEASE_VALUE = true;
@@ -43,12 +43,11 @@ public class ElevatorSubsystem extends Subsystem {
     }
     
     public boolean hasMaxBalls() {
-        return false;
-        //return topBall.get() && middleBall.get() && bottomBall.get();
+        return !topBall.get() && !middleBall.get() && !bottomBall.get();
     }
     
     public boolean hasBalls() {
-        return topBall.get() || middleBall.get() || bottomBall.get();
+        return !topBall.get() || !middleBall.get() || !bottomBall.get();
     }
     
     public boolean elevatorRunning() {
@@ -81,9 +80,11 @@ public class ElevatorSubsystem extends Subsystem {
         }
     }
     
-    public void runRoller(boolean shootRequest) {
-        if(hasMaxBalls() && !shootRequest) {
-            elevatorMotor.set(0.0);
+    public void runRoller(boolean disableRequest, boolean shootRequest) {
+        boolean shooting = shootRequest || releasingBall;
+        
+        if((hasMaxBalls() || disableRequest) && !shooting) {
+            disable();
         } else {
             elevatorMotor.set(ELEVATOR_SPEED);
         }
@@ -92,7 +93,7 @@ public class ElevatorSubsystem extends Subsystem {
     public void print() {
         System.out.print("(Elevator Subsystem)\n");
         
-        System.out.print("topBall: " + topBall.get() + " middleBall: " + middleBall.get() + " bottomBall: " + bottomBall.get() + "\n");
+        System.out.print("topBall: " + !topBall.get() + " middleBall: " + !middleBall.get() + " bottomBall: " + !bottomBall.get() + "\n");
         System.out.print("elevatorMotor: " + elevatorMotor.get() + "\n");
     }
 }

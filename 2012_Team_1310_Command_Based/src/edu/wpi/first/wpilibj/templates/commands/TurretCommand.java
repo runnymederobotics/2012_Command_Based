@@ -2,15 +2,15 @@ package edu.wpi.first.wpilibj.templates.commands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.templates.CameraSystem;
+import edu.wpi.first.wpilibj.templates.subsystems.TurretSubsystem;
 
 public class TurretCommand extends CommandBase {
-    final double TURRET_SPEED = 0.7;
     final double CAMERA_TOLERANCE = 0.5; //Degrees
     
-    double[] targetAngle = new double[1];
-    boolean[] freshSequence = new boolean[1];
+    static double[] targetAngle = new double[1];
+    static boolean[] freshSequence = new boolean[1];
     
-    int[] readerSequenceNumber = new int[1];
+    static int[] readerSequenceNumber = new int[1];
     
     public TurretCommand() {
         requires(turretSubsystem);
@@ -22,16 +22,14 @@ public class TurretCommand extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+        boolean canSeeTarget = CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
+
         if(DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle()) {
-            turretSubsystem.disablePID();
-            turretSubsystem.setSpeed(TURRET_SPEED * oi.getManualTurretDirection());
+            turretSubsystem.setRelativeAngleSetpoint(5 * oi.getManualTurretDirection());
         } else {
-            turretSubsystem.enablePID();
-            
-            boolean canSeeTarget = CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
-            
-            if(canSeeTarget && freshSequence[0] && Math.abs(targetAngle[0]) > CAMERA_TOLERANCE) {
-                turretSubsystem.setRelativeAngleSetpoint(targetAngle[0] / 2 /* / 5*/);
+            //turretSubsystem.enable();
+            if(canSeeTarget && freshSequence[0]) {
+                turretSubsystem.setRelativeAngleSetpoint(targetAngle[0]);// / 2 /* / 5*/);
             } else if(canSeeTarget && !freshSequence[0]) {
                 //Do nothing
             } else if(!canSeeTarget && freshSequence[0]) {
@@ -39,6 +37,7 @@ public class TurretCommand extends CommandBase {
                 //turretSubsystem.searchForTarget(oi.getManualTurretDirection());
             }
         }
+        turretSubsystem.execute();
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -54,4 +53,9 @@ public class TurretCommand extends CommandBase {
     // subsystems is scheduled to run
     protected void interrupted() {
     }
+    
+    public static void print() {
+        System.out.print("Turret angle: " + targetAngle[0] + " readerSequence: " + readerSequenceNumber[0] + " freshSequence: " + freshSequence[0] + " operator: " + oi.getManualTurretToggle() + "\n");
+    }
+            
 }

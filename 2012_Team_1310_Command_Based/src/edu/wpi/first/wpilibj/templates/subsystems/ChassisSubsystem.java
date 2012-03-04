@@ -26,7 +26,7 @@ public class ChassisSubsystem extends Subsystem {
     final double PID_GYRO_TOLERANCE = 1; //Degrees
     
     final double PID_COUNT_MAX_INPUT = Short.MAX_VALUE;
-    final double PID_COUNT_MIN_INPUT = Short.MIN_VALUE;
+    final double PID_COUNT_MIN_INPUT = -Short.MAX_VALUE;
     
     final double PID_COUNT_MAX_OUTPUT = 0.25;
     final double PID_GYRO_MAX_OUTPUT = 0.25;
@@ -127,10 +127,10 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     private void updateInputRange() {
-        pidLeft.setInputRange(-maxEncoderRate, maxEncoderRate);
+        pidLeft.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
         pidLeft.setOutputRange(-1.0, 1.0);
         
-        pidRight.setInputRange(-maxEncoderRate, maxEncoderRate);
+        pidRight.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
         pidRight.setOutputRange(-1.0, 1.0);
     }
     
@@ -191,7 +191,6 @@ public class ChassisSubsystem extends Subsystem {
     public void transShift(boolean value) {
         transShift.set(value);
         maxEncoderRate = value ? MAX_HIGH_ENCODER_RATE : MAX_LOW_ENCODER_RATE;
-        updateInputRange();
     }
     
     public void setCountSetpoint(int encoderCounts) {
@@ -245,15 +244,16 @@ public class ChassisSubsystem extends Subsystem {
     
     private void setSetpoint(double left, double right, boolean autoTrans) {
         if(autoTrans) {
-            int rate = (Math.abs(encLeft.get()) + Math.abs(encRight.get())) / 2; //Average rate
-            
-            double LOW_SPEED_PERCENT = 0.9; //Threshold to switch at when in low speed
-            double HIGH_SPEED_PERCENT = 0.6; //Threshold to switch at when in high speed
-            
-            if(!transShift.get())
-                transShift.set((rate >= LOW_SPEED_PERCENT * MAX_LOW_ENCODER_RATE) ? true : transShift.get());
-            else if(transShift.get())
-                transShift.set((rate <= HIGH_SPEED_PERCENT * MAX_HIGH_ENCODER_RATE) ? false : transShift.get());
+            final double rate = (Math.abs(encLeft.getRate()) + Math.abs(encRight.getRate())) / 2; //Average rate
+             
+            final double SWITCH_UP_PERCENT = 0.9; //Threshold to switch at when in low speed
+            final double SWITCH_DOWN_PERCENT = 0.5; //Threshold to switch at when in high speed
+             
+            if(rate >= SWITCH_UP_PERCENT * MAX_LOW_ENCODER_RATE) {
+                transShift.set(true);
+            } else if(rate <= SWITCH_DOWN_PERCENT * MAX_LOW_ENCODER_RATE) {
+                transShift.set(false);
+            }
         }
         
         if(pidLeft.isEnable() && pidRight.isEnable()) {
@@ -268,6 +268,8 @@ public class ChassisSubsystem extends Subsystem {
     public void print() {
         System.out.print("(Chassis Subsystem)\n");
         
+        System.out.print("rate: " + (Math.abs(encLeft.getRate()) + Math.abs(encRight.getRate())) / 2 + "\n");
+        System.out.print("transShift: " + transShift.get() + "\n");
         System.out.print("PIDLeftCount output: " + pidLeftCount.get() + " PIDRightCount output: " + pidRightCount.get() + "\n");
         System.out.print("PIDLeftCount setpoint: " + pidLeftCount.getSetpoint() + " PIDRightCount setpoint: " + pidRightCount.getSetpoint() + "\n");
         System.out.print("EncLeftCount: " + encLeftCount.pidGet() + " EncRightCount: " + encRightCount.pidGet() + "\n");

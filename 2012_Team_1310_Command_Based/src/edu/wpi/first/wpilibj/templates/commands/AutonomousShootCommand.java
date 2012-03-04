@@ -15,7 +15,7 @@ public class AutonomousShootCommand extends CommandBase {
     protected void execute() {
         boolean shootRequest = true;
         
-        elevatorSubsystem.runRoller(shootRequest);
+        elevatorSubsystem.runRoller(false, shootRequest);
         elevatorSubsystem.handleBallRelease(shootRequest, shooterSubsystem.getShooterRunning());
     }
 

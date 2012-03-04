@@ -3,52 +3,101 @@ package edu.wpi.first.wpilibj.templates.subsystems;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Jaguar;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.templates.OutputStorage;
 import edu.wpi.first.wpilibj.templates.RobotMap;
 import edu.wpi.first.wpilibj.templates.commands.TurretCommand;
 
-public class TurretSubsystem extends PIDSubsystem {
+public class TurretSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
-    static final double PID_P = 0.0025, PID_I = 0.0, PID_D = 0.0;
-    final double COUNTS_PER_DEGREE = 13; //We turned the turret 90 degrees and divided the encoder counts by 90
-    final double MAX_SPEED = 1.0;
-    final double SEARCH_ANGULAR_VELOCITY = 1.0; //Degrees
-    
+    public static final double TURRET_SPEED_LEFT = 0.15;
+    public static final double TURRET_SPEED_RIGHT = 0.2;
+    static final double PID_P = 0.05, PID_I = 0.000, PID_D = 0.0;
+    final double COUNTS_PER_DEGREE = 9.18;
+    public static final int SEARCH_RIGHT = 1;
+    public static final int SEARCH_LEFT = -1;
     Jaguar turretMotor = new Jaguar(RobotMap.TURRET_MOTOR);
     
     Encoder encTurret = new Encoder(RobotMap.ENC_TURRET_A, RobotMap.ENC_TURRET_B);
     
+    OutputStorage outputStorage = new OutputStorage();
+
+    //PIDController pidTurret = new PIDController(PID_P, PID_I, PID_D, encTurret, outputStorage);
+    
     DigitalInput leftLimit = new DigitalInput(RobotMap.TURRET_LEFT_LIMIT);
     DigitalInput rightLimit = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
     
-    boolean usePID = true;
-    
     int searchDirection = 1;
     
+    
+    int setPoint = 0;
+    final int TOLERANCE = (int)(COUNTS_PER_DEGREE) * 3;
+    double output = 0;
+    public void execute() {
+        final int currentSpot = encTurret.get();
+        //double output = outputStorage.get();
+        output = 0;
+        final int error = currentSpot - setPoint;
+        if(error >= TOLERANCE) {
+            output = -TURRET_SPEED_LEFT;
+        } else if(error <= -TOLERANCE) {
+            output = TURRET_SPEED_RIGHT;
+        }
+        if((rightLimit.get() && output < 0)
+           || (leftLimit.get() && output > 0)) {
+            output = 0;
+        }
+        turretMotor.set(output);
+    }
+    
+    public void setRelativeAngleSetpoint(double angle) {
+        if(angle != 0 && (onTarget() || leftLimit.get() || rightLimit.get())) {
+            setPoint = encTurret.get() + (int)(angle * COUNTS_PER_DEGREE);
+            //pidTurret.setSetpoint(setPoint);
+        }
+    }
+    
+    public boolean onTarget() {
+        final int error = encTurret.get() - setPoint;
+        if(error < TOLERANCE && error > -TOLERANCE) {
+            return true;
+        }
+        return false;
+    }
+
     public TurretSubsystem() {
-        super("PIDTurret", PID_P, PID_I, PID_D);
-        
         encTurret.start();
+        encTurret.setPIDSourceParameter(Encoder.PIDSourceParameter.kDistance);
+        /*pidTurret.setOutputRange(-TURRET_SPEED_LEFT, TURRET_SPEED_RIGHT);
+        pidTurret.setInputRange(-COUNTS_PER_DEGREE * 360, COUNTS_PER_DEGREE * 360);
+        pidTurret.setTolerance(COUNTS_PER_DEGREE / (COUNTS_PER_DEGREE * 360));
+        pidTurret.enable();*/
         
-        setSetpointRange(Short.MIN_VALUE, Short.MAX_VALUE);
+        
+        //SmartDashboard.putData("PIDTurret", pidTurret);
     }
     
     public void reset() {
-        encTurret.reset();
+        //encTurret.reset();
     }
     
     public void disable() {
-        reset();
-        
-        super.disable();
+        /*if(pidTurret.isEnable()) {
+            reset();
+            pidTurret.disable();
+        }*/
     }
     
     public void enable() {
-        reset();
-        
-        super.enable();
+        /*if(!pidTurret.isEnable()) {
+            reset();
+            pidTurret.enable();
+        }*/
     }
     
     public void initDefaultCommand() {
@@ -56,16 +105,8 @@ public class TurretSubsystem extends PIDSubsystem {
         setDefaultCommand(new TurretCommand());
     }
     
-    public void enablePID() {
-        usePID = true;
-    }
-    
-    public void disablePID() {
-        usePID = false;
-    }
-    
-    public void setRelativeAngleSetpoint(double angle) {
-        setSetpointRelative(angle * COUNTS_PER_DEGREE);
+    /*public void setRelativeAngleSetpoint(double angle) {
+        pidTurret.setSetpoint(encTurret.get() + angle * COUNTS_PER_DEGREE);
     }
     
     public void setSpeed(double speed) {
@@ -84,9 +125,7 @@ public class TurretSubsystem extends PIDSubsystem {
         
         turretMotor.set(speed);
     }
-    
-    public static final int SEARCH_RIGHT = 1;
-    public static final int SEARCH_LEFT = -1;
+   
     
     public void searchForTarget(int requestedDirection) {
         boolean requestingDirection = requestedDirection != 0;
@@ -104,25 +143,12 @@ public class TurretSubsystem extends PIDSubsystem {
                 searchDirection = SEARCH_LEFT;
             }
         }
-        
-        if(usePID) {
-            setRelativeAngleSetpoint(searchDirection);
-        }
-    }
-
-    protected double returnPIDInput() {
-        return encTurret.get();
-    }
-
-    protected void usePIDOutput(double output) {
-        if(usePID) {
-            setSpeed(output);
-        }
-    }
+        setRelativeAngleSetpoint(searchDirection);
+    }*/
     
     public void print() {
         System.out.print("(Turret Subsystem)\n");
-        
-        System.out.print("PIDTurret output: " + turretMotor.get() + " PIDTurret setpoint: " + getSetpoint() + " encTurret: " + encTurret.get() + "\n");
+        System.out.print("setPoint: " + setPoint + " current: " + encTurret.get() + " output: " + output + " onTarget: " + onTarget() + " error: " + (encTurret.get() - setPoint) + "\n");
+        //System.out.print("PIDTurret output: " + pidTurret.get() + " PIDTurret setpoint: " + pidTurret.getSetpoint() + " encTurret: " + encTurret.get() + "\n");
     }
 }

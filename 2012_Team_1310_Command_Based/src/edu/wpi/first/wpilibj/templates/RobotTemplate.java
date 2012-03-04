@@ -121,6 +121,7 @@ public class RobotTemplate extends IterativeRobot {
             CommandBase.shooterSubsystem.print();
             System.out.print("\n");
             CommandBase.turretSubsystem.print();
+            TurretCommand.print();;
             System.out.print("\n");
             CommandBase.oi.print();
             System.out.print("\n");
