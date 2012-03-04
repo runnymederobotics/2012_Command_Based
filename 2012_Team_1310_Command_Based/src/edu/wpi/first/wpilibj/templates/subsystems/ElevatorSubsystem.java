@@ -19,6 +19,7 @@ public class ElevatorSubsystem extends Subsystem {
     double ELEVATOR_SPEED = 0.5;
     double RELEASE_DELAY = 0.35;
     double RECOVER_TIME = 0.75; //Time for shooter to recover after a shot
+    final double BALL_SENSOR_SEND_DELAY = 0.25;
     final boolean RELEASE_VALUE = true;
     
     Jaguar elevatorMotor = new Jaguar(RobotMap.ELEVATOR_MOTOR);
@@ -125,10 +126,22 @@ public class ElevatorSubsystem extends Subsystem {
         System.out.print("elevatorMotor: " + elevatorMotor.get() + "\n");
     }
     
+    boolean lastBottom = false;
+    boolean lastMiddle = false;
+    boolean lastTop = false;
+    double lastBallSensorSendTime = 0.0;
     public void updateDashboard() {
-        //Update our ball counter on the dashboard
-        networkTable.putBoolean("BottomBall", !bottomBall.get());
-        networkTable.putBoolean("MiddleBall", !middleBall.get());
-        networkTable.putBoolean("TopBall", !topBall.get());
+        /*double now = Timer.getFPGATimestamp();
+        if(now - lastBallSensorSendTime > BALL_SENSOR_SEND_DELAY) {
+            
+            //Update our ball counter on the dashboard
+            networkTable.beginTransaction();
+            networkTable.putBoolean("BottomBall", !bottomBall.get());
+            networkTable.putBoolean("MiddleBall", !middleBall.get());
+            networkTable.putBoolean("TopBall", !topBall.get());
+            networkTable.endTransaction();
+            
+            lastBallSensorSendTime = now;
+        }*/
     }
 }
