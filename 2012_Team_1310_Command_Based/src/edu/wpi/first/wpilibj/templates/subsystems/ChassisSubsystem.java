@@ -64,7 +64,7 @@ public class ChassisSubsystem extends Subsystem {
     
     Pneumatic transShift = new Pneumatic(new DoubleSolenoid(1, 2));
 
-    double maxEncoderRate = MAX_LOW_ENCODER_RATE;
+    //double maxEncoderRate = MAX_LOW_ENCODER_RATE;
     
     public ChassisSubsystem() {
         encLeft.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
@@ -190,7 +190,7 @@ public class ChassisSubsystem extends Subsystem {
     
     public void transShift(boolean value) {
         transShift.set(value);
-        maxEncoderRate = value ? MAX_HIGH_ENCODER_RATE : MAX_LOW_ENCODER_RATE;
+        //maxEncoderRate = value ? MAX_HIGH_ENCODER_RATE : MAX_LOW_ENCODER_RATE;
     }
     
     public void setCountSetpoint(int encoderCounts) {
@@ -243,22 +243,32 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     private void setSetpoint(double left, double right, boolean autoTrans) {
+        double leftSetpoint;
+        double rightSetpoint;
+        
         if(autoTrans) {
             final double rate = (Math.abs(encLeft.getRate()) + Math.abs(encRight.getRate())) / 2; //Average rate
              
             final double SWITCH_UP_PERCENT = 0.9; //Threshold to switch at when in low speed
-            final double SWITCH_DOWN_PERCENT = 0.5; //Threshold to switch at when in high speed
-             
+            final double SWITCH_DOWN_PERCENT = 0.8; //Threshold to switch at when in high speed
+            
             if(rate >= SWITCH_UP_PERCENT * MAX_LOW_ENCODER_RATE) {
                 transShift.set(true);
             } else if(rate <= SWITCH_DOWN_PERCENT * MAX_LOW_ENCODER_RATE) {
                 transShift.set(false);
             }
+            
+            //Use high gear in auto trans so that you dont get a jump in speed when it actually shifts
+            leftSetpoint = left * MAX_HIGH_ENCODER_RATE;
+            rightSetpoint = right * MAX_HIGH_ENCODER_RATE;
+        } else {
+            leftSetpoint = left * (transShift.get() ? MAX_HIGH_ENCODER_RATE : MAX_LOW_ENCODER_RATE);
+            rightSetpoint = right * (transShift.get() ? MAX_HIGH_ENCODER_RATE : MAX_LOW_ENCODER_RATE);
         }
         
         if(pidLeft.isEnable() && pidRight.isEnable()) {
-            pidLeft.setSetpoint(left * maxEncoderRate);
-            pidRight.setSetpoint(right * maxEncoderRate);
+            pidLeft.setSetpoint(leftSetpoint);
+            pidRight.setSetpoint(rightSetpoint);
         } else {
             motorLeft.set(left);
             motorRight.set(right);
