@@ -46,8 +46,8 @@ public class ShooterSubsystem extends Subsystem {
         encShooter.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encShooter.start();
         
-        pidShooter.setInputRange(-MAX_SHOOTER_ENCODER_RATE, MAX_SHOOTER_ENCODER_RATE);
-        pidShooter.setOutputRange(-1.0, 1.0);
+        pidShooter.setInputRange(0.0, MAX_SHOOTER_ENCODER_RATE); //I JUST CHANGED THE MIN FROM -MAX_SHOOTER_ENCODER_RATE to 0.0
+        pidShooter.setOutputRange(0.0, 1.0); //I JUST CHANGED THE MIN FROM -1.0 to 0.0
         SmartDashboard.putData("PIDShooter", pidShooter);
         
         enablePID();
@@ -77,10 +77,11 @@ public class ShooterSubsystem extends Subsystem {
     ExperimentalMeasurement[] powerLookupTable = {
         new ExperimentalMeasurement(0.0, 0.0),
         
+        new ExperimentalMeasurement(107, 0.33),
         new ExperimentalMeasurement(93, 0.36),
         new ExperimentalMeasurement(110.5, 0.39),
         new ExperimentalMeasurement(78, 0.31),
-        //new ExperimentalMeasurement(, ),
+        new ExperimentalMeasurement(160, 0.56),
         
         new ExperimentalMeasurement(10000.0, 1.0),
     };

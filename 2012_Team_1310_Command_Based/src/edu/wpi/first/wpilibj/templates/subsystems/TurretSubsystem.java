@@ -3,10 +3,7 @@ package edu.wpi.first.wpilibj.templates.subsystems;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Jaguar;
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.OutputStorage;
 import edu.wpi.first.wpilibj.templates.RobotMap;
 import edu.wpi.first.wpilibj.templates.commands.TurretCommand;
@@ -15,12 +12,17 @@ public class TurretSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
-    public static final double TURRET_SPEED_LEFT = 0.15;
-    public static final double TURRET_SPEED_RIGHT = 0.2;
     static final double PID_P = 0.05, PID_I = 0.000, PID_D = 0.0;
     final double COUNTS_PER_DEGREE = 9.18;
+    final double TOLERANCE = COUNTS_PER_DEGREE * 2;
     public static final int SEARCH_RIGHT = 1;
     public static final int SEARCH_LEFT = -1;
+    
+    public static final double TURRET_SPEED_LEFT = 0.05;
+    public static final double TURRET_SPEED_RIGHT = 0.1;
+    final double MAX_ERROR = COUNTS_PER_DEGREE * 20;
+    final double MIN_OUTPUT = 0.1;
+    
     Jaguar turretMotor = new Jaguar(RobotMap.TURRET_MOTOR);
     
     Encoder encTurret = new Encoder(RobotMap.ENC_TURRET_A, RobotMap.ENC_TURRET_B);
@@ -34,9 +36,7 @@ public class TurretSubsystem extends Subsystem {
     
     int searchDirection = 1;
     
-    
     int setPoint = 0;
-    final int TOLERANCE = (int)(COUNTS_PER_DEGREE) * 3;
     double output = 0;
     public void execute() {
         final int currentSpot = encTurret.get();
@@ -52,7 +52,18 @@ public class TurretSubsystem extends Subsystem {
            || (leftLimit.get() && output > 0)) {
             output = 0;
         }
-        turretMotor.set(output);
+        
+        if(Math.abs(error) > MAX_ERROR) {
+            output *= 2;
+        }
+        
+        /*double percentageError = Math.abs(error / MAX_ERROR);
+        percentageError = Math.abs(percentageError * output) < MIN_OUTPUT ? Math.abs(MIN_OUTPUT / output) : percentageError;
+        if(percentageError < 1.0) {
+            output *= percentageError;
+        }*/
+        
+        turretMotor.set(output); 
     }
     
     public void setRelativeAngleSetpoint(double angle) {
@@ -83,7 +94,7 @@ public class TurretSubsystem extends Subsystem {
     }
     
     public void reset() {
-        //encTurret.reset();
+        encTurret.reset();
     }
     
     public void disable() {
@@ -94,6 +105,8 @@ public class TurretSubsystem extends Subsystem {
     }
     
     public void enable() {
+        setPoint = 0;
+        reset();
         /*if(!pidTurret.isEnable()) {
             reset();
             pidTurret.enable();
@@ -148,7 +161,7 @@ public class TurretSubsystem extends Subsystem {
     
     public void print() {
         System.out.print("(Turret Subsystem)\n");
-        System.out.print("setPoint: " + setPoint + " current: " + encTurret.get() + " output: " + output + " onTarget: " + onTarget() + " error: " + (encTurret.get() - setPoint) + "\n");
+        System.out.print("setPoint (counts): " + setPoint + " setPoint (relative degrees): " + ((setPoint - encTurret.get()) / COUNTS_PER_DEGREE) + " current: " + encTurret.get() + " output: " + output + " onTarget: " + onTarget() + " error: " + (encTurret.get() - setPoint) + "\n");
         //System.out.print("PIDTurret output: " + pidTurret.get() + " PIDTurret setpoint: " + pidTurret.getSetpoint() + " encTurret: " + encTurret.get() + "\n");
     }
 }

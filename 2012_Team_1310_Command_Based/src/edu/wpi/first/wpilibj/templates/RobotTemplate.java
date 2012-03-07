@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.templates;
 
+import RobotCLI.RobotCLI;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.commands.*;
+import java.io.IOException;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,6 +26,8 @@ import edu.wpi.first.wpilibj.templates.commands.*;
  * directory.
  */
 public class RobotTemplate extends IterativeRobot {
+    
+    private RobotCLI robotCLI;
     
     Compressor compressor = new Compressor(RobotMap.COMPRESSOR_DI, 1);
     
@@ -42,6 +46,14 @@ public class RobotTemplate extends IterativeRobot {
     public void robotInit() {
         // Initialize all subsystems
         CommandBase.init();
+        
+        try {
+            if(robotCLI == null) {
+                robotCLI = new RobotCLI("1310", 10000);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
         compressor.start();
 
@@ -95,7 +107,7 @@ public class RobotTemplate extends IterativeRobot {
     //This function is called periodically during autonomous
     public void autonomousPeriodic() {
         Scheduler.getInstance().run();
-        print("Autonomous");
+        //print("Autonomous");
     }
     //This function is called periodically during operator control
     public void teleopPeriodic() {

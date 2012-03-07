@@ -27,17 +27,18 @@ public class DriveDistanceCommand extends CommandBase {
         // Use requires() here to declare subsystem dependencies
         requires(chassisSubsystem);
         
+        System.out.println("DriveDistanceCommand encoderCounts = " + encoderCounts);
         this.encoderCounts = encoderCounts;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
         System.out.println("Setpoint is " + encoderCounts);
-        chassisSubsystem.setCountSetpoint(encoderCounts);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+        chassisSubsystem.setCountSetpoint(encoderCounts);
         chassisSubsystem.goToCountSetpoint();
     }
 

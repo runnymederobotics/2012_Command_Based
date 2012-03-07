@@ -20,15 +20,15 @@ public class ChassisSubsystem extends Subsystem {
     // here. Call these from Commands.
     
     final int MAX_LOW_ENCODER_RATE = 800;
-    final int MAX_HIGH_ENCODER_RATE = 1900;
+    final int MAX_HIGH_ENCODER_RATE = 2100;
     
-    final double PID_COUNT_TOLERANCE = 10; //Counts
+    final double PID_COUNT_TOLERANCE = 30; //Counts
     final double PID_GYRO_TOLERANCE = 1; //Degrees
     
     final double PID_COUNT_MAX_INPUT = Short.MAX_VALUE;
     final double PID_COUNT_MIN_INPUT = -Short.MAX_VALUE;
     
-    final double PID_COUNT_MAX_OUTPUT = 0.25;
+    final double PID_COUNT_MAX_OUTPUT = 0.5;
     final double PID_GYRO_MAX_OUTPUT = 0.25;
     
     final double PID_P = 0.0, PID_I = 0.0003, PID_D = 0.0;
@@ -72,6 +72,12 @@ public class ChassisSubsystem extends Subsystem {
         encLeft.start();
         encRight.start();
         
+        pidLeft.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
+        pidLeft.setOutputRange(-1.0, 1.0);
+        
+        pidRight.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
+        pidRight.setOutputRange(-1.0, 1.0);
+        
         gyroXY.reset();
         gyroYZ.reset();
         
@@ -87,8 +93,6 @@ public class ChassisSubsystem extends Subsystem {
         pidRightCount.setTolerance(PID_COUNT_TOLERANCE / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
         pidRightCount.setInputRange(PID_COUNT_MIN_INPUT, PID_COUNT_MAX_INPUT);
         pidRightCount.setOutputRange(-PID_COUNT_MAX_OUTPUT, PID_COUNT_MAX_OUTPUT);
-        
-        updateInputRange();
         
         SmartDashboard.putData("PIDLeft", pidLeft);
         SmartDashboard.putData("PIDRight", pidRight);
@@ -126,14 +130,6 @@ public class ChassisSubsystem extends Subsystem {
         setDefaultCommand(new DriveCommand());
     }
     
-    private void updateInputRange() {
-        pidLeft.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
-        pidLeft.setOutputRange(-1.0, 1.0);
-        
-        pidRight.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
-        pidRight.setOutputRange(-1.0, 1.0);
-    }
-    
     public void disablePID() {
         if(pidLeft.isEnable() || pidRight.isEnable()) {
             pidLeft.disable();
@@ -143,6 +139,8 @@ public class ChassisSubsystem extends Subsystem {
     
     public void disablePIDCount() {
         if(pidLeftCount.isEnable() || pidRightCount.isEnable()) {
+            pidLeftCount.setSetpoint(0.0);
+            pidRightCount.setSetpoint(0.0);
             pidLeftCount.disable();
             pidRightCount.disable();
         }
@@ -167,8 +165,6 @@ public class ChassisSubsystem extends Subsystem {
             encRight.reset();
             pidLeftCount.enable();
             pidRightCount.enable();
-            pidLeftCount.setSetpoint(0.0);
-            pidRightCount.setSetpoint(0.0);
         }
     }
     
@@ -194,7 +190,6 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void setCountSetpoint(int encoderCounts) {
-        disablePIDCount(); //Make sure we reset the encoders
         enablePIDCount();
         //enablePID();
         
@@ -211,11 +206,16 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void goToCountSetpoint() {
-        if(pidLeftCount.onTarget() && pidRightCount.onTarget()) {
+        System.out.println("goToCountSetpoint Function");
+        System.out.println("leftSetpoint:" + pidLeftCount.getSetpoint() + " rightSetpoint: " + pidRightCount.getSetpoint());
+        System.out.println("leftCounts: " + encLeftCount.pidGet() + " rightCounts: " + encRightCount.pidGet());
+        System.out.println("pidCountLeft: " + pidLeftCount.get() + " pidCountRight: " + pidRightCount.get());
+        System.out.println("pidCountLeftError: " + pidLeftCount.getError() + " pidCountRightError: " + pidRightCount.getError());
+        robotDrive.arcadeDrive(0.0, 0.0); //Keep robotDrive updated
+        if(reachedCountSetpoint()) {
             disablePIDCount();
         } else {
-            robotDrive.arcadeDrive(0.0, 0.0); //Keep robotDrive updated
-            
+            //drive((pidLeftCount.get() + pidRightCount.get()) / -2, 0.0, false);
             setSetpoint(-pidLeftCount.get(), pidRightCount.get(), false); //Dont allow high speed
         }
     }
@@ -229,7 +229,10 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public boolean reachedCountSetpoint() {
-        return (pidLeftCount.onTarget() && pidRightCount.onTarget());
+        double leftError = Math.abs(pidLeftCount.getSetpoint() - encLeftCount.pidGet());
+        double rightError = Math.abs(pidRightCount.getSetpoint() - encRightCount.pidGet());
+        return leftError < PID_COUNT_TOLERANCE && rightError < PID_COUNT_TOLERANCE;
+        //return (pidLeftCount.onTarget() && pidRightCount.onTarget());
     }
     
     public boolean reachedAngleSetpoint() {
@@ -247,10 +250,11 @@ public class ChassisSubsystem extends Subsystem {
         double rightSetpoint;
         
         if(autoTrans) {
-            final double rate = (Math.abs(encLeft.getRate()) + Math.abs(encRight.getRate())) / 2; //Average rate
+            //Right rate - left rate because left rate is negative
+            final double rate = Math.abs(encRight.getRate() - encLeft.getRate()) / 2; //Average rate
              
             final double SWITCH_UP_PERCENT = 0.9; //Threshold to switch at when in low speed
-            final double SWITCH_DOWN_PERCENT = 0.8; //Threshold to switch at when in high speed
+            final double SWITCH_DOWN_PERCENT = 0.5; //Threshold to switch at when in high speed
             
             if(rate >= SWITCH_UP_PERCENT * MAX_LOW_ENCODER_RATE) {
                 transShift.set(true);

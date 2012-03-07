@@ -2,11 +2,8 @@ package edu.wpi.first.wpilibj.templates.commands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.templates.CameraSystem;
-import edu.wpi.first.wpilibj.templates.subsystems.TurretSubsystem;
 
-public class TurretCommand extends CommandBase {
-    final double CAMERA_TOLERANCE = 0.5; //Degrees
-    
+public class TurretCommand extends CommandBase {    
     static double[] targetAngle = new double[1];
     static boolean[] freshSequence = new boolean[1];
     
@@ -25,11 +22,11 @@ public class TurretCommand extends CommandBase {
         boolean canSeeTarget = CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
 
         if(DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle()) {
-            turretSubsystem.setRelativeAngleSetpoint(5 * oi.getManualTurretDirection());
+            turretSubsystem.setRelativeAngleSetpoint(15 * oi.getManualTurretDirection());
         } else {
             //turretSubsystem.enable();
             if(canSeeTarget && freshSequence[0]) {
-                turretSubsystem.setRelativeAngleSetpoint(targetAngle[0]);// / 2 /* / 5*/);
+                turretSubsystem.setRelativeAngleSetpoint(targetAngle[0]);
             } else if(canSeeTarget && !freshSequence[0]) {
                 //Do nothing
             } else if(!canSeeTarget && freshSequence[0]) {
