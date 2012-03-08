@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.templates.subsystems;
 
+import RobotCLI.RobotCLI;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.templates.Pneumatic;
@@ -11,6 +12,10 @@ public class BridgeTipSubsystem extends Subsystem {
     // here. Call these from Commands.
 
     Pneumatic bridgeTipperPneumatic = new Pneumatic(new DoubleSolenoid(RobotMap.BRIDGE_TIPPER_ONE, RobotMap.BRIDGE_TIPPER_TWO));
+    
+    public BridgeTipSubsystem(RobotCLI robotCLI) {
+        
+    }
     
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.

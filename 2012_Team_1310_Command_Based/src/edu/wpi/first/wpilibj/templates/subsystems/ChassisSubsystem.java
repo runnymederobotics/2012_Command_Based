@@ -1,5 +1,9 @@
 package edu.wpi.first.wpilibj.templates.subsystems;
 
+import RobotCLI.Parsable.ParsableDouble;
+import RobotCLI.Parsable.ParsableInteger;
+import RobotCLI.RobotCLI;
+import RobotCLI.RobotCLI.VariableContainer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Jaguar;
@@ -19,21 +23,21 @@ public class ChassisSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
     
-    final int MAX_LOW_ENCODER_RATE = 800;
-    final int MAX_HIGH_ENCODER_RATE = 2100;
-    
-    final double PID_COUNT_TOLERANCE = 30; //Counts
-    final double PID_GYRO_TOLERANCE = 1; //Degrees
-    
     final double PID_COUNT_MAX_INPUT = Short.MAX_VALUE;
     final double PID_COUNT_MIN_INPUT = -Short.MAX_VALUE;
-    
-    final double PID_COUNT_MAX_OUTPUT = 0.5;
-    final double PID_GYRO_MAX_OUTPUT = 0.25;
     
     final double PID_P = 0.0, PID_I = 0.0003, PID_D = 0.0;
     final double PID_GYRO_P = 0.001, PID_GYRO_I = 0.0, PID_GYRO_D = 0.0;
     final double PID_COUNT_P = 0.05, PID_COUNT_I = 0.0, PID_COUNT_D = 0.0;
+    
+    ParsableInteger MAX_LOW_ENCODER_RATE;
+    ParsableInteger MAX_HIGH_ENCODER_RATE;
+    
+    ParsableDouble PID_COUNT_TOLERANCE; //Counts
+    ParsableDouble PID_GYRO_TOLERANCE; //Degrees
+    
+    ParsableDouble PID_COUNT_MAX_OUTPUT;
+    ParsableDouble PID_GYRO_MAX_OUTPUT;
     
     Jaguar motorLeft = new Jaguar(RobotMap.LEFT_MOTOR);
     Jaguar motorRight = new Jaguar(RobotMap.RIGHT_MOTOR);
@@ -66,7 +70,18 @@ public class ChassisSubsystem extends Subsystem {
 
     //double maxEncoderRate = MAX_LOW_ENCODER_RATE;
     
-    public ChassisSubsystem() {
+    public ChassisSubsystem(RobotCLI robotCLI) {
+        VariableContainer vc = robotCLI.getVariables().createContainer("chassisSubsystem");
+        
+        MAX_LOW_ENCODER_RATE = vc.createInteger("maxLowEncoderRate", 800);
+        MAX_HIGH_ENCODER_RATE = vc.createInteger("maxHighEncoderRate", 2100);
+    
+        PID_COUNT_TOLERANCE = vc.createDouble("pidCountTolerance (counts)", 30);
+        PID_GYRO_TOLERANCE = vc.createDouble("pidGyroTolerance (degrees)", 1); //Degrees
+
+        PID_COUNT_MAX_OUTPUT = vc.createDouble("pidCountMaxOutput", 0.5);
+        PID_GYRO_MAX_OUTPUT = vc.createDouble("pidGyroMaxOutput", 0.25);
+        
         encLeft.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encRight.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encLeft.start();
@@ -81,18 +96,18 @@ public class ChassisSubsystem extends Subsystem {
         gyroXY.reset();
         gyroYZ.reset();
         
-        pidGyro.setTolerance(PID_GYRO_TOLERANCE / 360);
+        pidGyro.setTolerance(PID_GYRO_TOLERANCE.get() / 360);
         pidGyro.setContinuous();
         pidGyro.setInputRange(-180, 180);
-        pidGyro.setOutputRange(-PID_GYRO_MAX_OUTPUT, PID_GYRO_MAX_OUTPUT);
+        pidGyro.setOutputRange(-PID_GYRO_MAX_OUTPUT.get(), PID_GYRO_MAX_OUTPUT.get());
  
-        pidLeftCount.setTolerance(PID_COUNT_TOLERANCE / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
+        pidLeftCount.setTolerance(PID_COUNT_TOLERANCE.get() / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
         pidLeftCount.setInputRange(PID_COUNT_MIN_INPUT, PID_COUNT_MAX_INPUT);
-        pidLeftCount.setOutputRange(-PID_COUNT_MAX_OUTPUT, PID_COUNT_MAX_OUTPUT);
+        pidLeftCount.setOutputRange(-PID_COUNT_MAX_OUTPUT.get(), PID_COUNT_MAX_OUTPUT.get());
 
-        pidRightCount.setTolerance(PID_COUNT_TOLERANCE / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
+        pidRightCount.setTolerance(PID_COUNT_TOLERANCE.get() / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
         pidRightCount.setInputRange(PID_COUNT_MIN_INPUT, PID_COUNT_MAX_INPUT);
-        pidRightCount.setOutputRange(-PID_COUNT_MAX_OUTPUT, PID_COUNT_MAX_OUTPUT);
+        pidRightCount.setOutputRange(-PID_COUNT_MAX_OUTPUT.get(), PID_COUNT_MAX_OUTPUT.get());
         
         SmartDashboard.putData("PIDLeft", pidLeft);
         SmartDashboard.putData("PIDRight", pidRight);
@@ -231,7 +246,7 @@ public class ChassisSubsystem extends Subsystem {
     public boolean reachedCountSetpoint() {
         double leftError = Math.abs(pidLeftCount.getSetpoint() - encLeftCount.pidGet());
         double rightError = Math.abs(pidRightCount.getSetpoint() - encRightCount.pidGet());
-        return leftError < PID_COUNT_TOLERANCE && rightError < PID_COUNT_TOLERANCE;
+        return leftError < PID_COUNT_TOLERANCE.get() && rightError < PID_COUNT_TOLERANCE.get();
         //return (pidLeftCount.onTarget() && pidRightCount.onTarget());
     }
     
@@ -256,18 +271,18 @@ public class ChassisSubsystem extends Subsystem {
             final double SWITCH_UP_PERCENT = 0.9; //Threshold to switch at when in low speed
             final double SWITCH_DOWN_PERCENT = 0.5; //Threshold to switch at when in high speed
             
-            if(rate >= SWITCH_UP_PERCENT * MAX_LOW_ENCODER_RATE) {
+            if(rate >= SWITCH_UP_PERCENT * MAX_LOW_ENCODER_RATE.get()) {
                 transShift.set(true);
-            } else if(rate <= SWITCH_DOWN_PERCENT * MAX_LOW_ENCODER_RATE) {
+            } else if(rate <= SWITCH_DOWN_PERCENT * MAX_LOW_ENCODER_RATE.get()) {
                 transShift.set(false);
             }
             
             //Use high gear in auto trans so that you dont get a jump in speed when it actually shifts
-            leftSetpoint = left * MAX_HIGH_ENCODER_RATE;
-            rightSetpoint = right * MAX_HIGH_ENCODER_RATE;
+            leftSetpoint = left * MAX_HIGH_ENCODER_RATE.get();
+            rightSetpoint = right * MAX_HIGH_ENCODER_RATE.get();
         } else {
-            leftSetpoint = left * (transShift.get() ? MAX_HIGH_ENCODER_RATE : MAX_LOW_ENCODER_RATE);
-            rightSetpoint = right * (transShift.get() ? MAX_HIGH_ENCODER_RATE : MAX_LOW_ENCODER_RATE);
+            leftSetpoint = left * (transShift.get() ? MAX_HIGH_ENCODER_RATE.get() : MAX_LOW_ENCODER_RATE.get());
+            rightSetpoint = right * (transShift.get() ? MAX_HIGH_ENCODER_RATE.get() : MAX_LOW_ENCODER_RATE.get());
         }
         
         if(pidLeft.isEnable() && pidRight.isEnable()) {

@@ -14,12 +14,11 @@ public class CameraSystem {
     
     //static Servo cameraServo;
     //static final int CAMERA_MAX_ANGLE = 180;
-    
+
     public static void init() {
         if(networkTable == null) {
             networkTable = NetworkTable.getTable("Camera1310");
         }
-        //cameraServo = new Servo(RobotMap.CAMERA_SERVO);
     }
     
     public static boolean canSeeTarget() {

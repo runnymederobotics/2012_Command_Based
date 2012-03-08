@@ -1,12 +1,14 @@
 package edu.wpi.first.wpilibj.templates.subsystems;
 
+import RobotCLI.Parsable.ParsableInteger;
+import RobotCLI.ParsablePIDController;
+import RobotCLI.RobotCLI;
+import RobotCLI.RobotCLI.VariableContainer;
 import com.sun.squawk.util.Arrays;
 import com.sun.squawk.util.Comparer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.RobotMap;
 import edu.wpi.first.wpilibj.templates.commands.ShooterCommand;
 
@@ -14,15 +16,20 @@ public class ShooterSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
-    final int MAX_SHOOTER_ENCODER_RATE = 15000;
+    ParsableInteger MAX_SHOOTER_ENCODER_RATE;
     
     Jaguar shooterMotor = new Jaguar(RobotMap.SHOOTER_MOTOR);
     
     Encoder encShooter = new Encoder(RobotMap.ENC_SHOOTER_A, RobotMap.ENC_SHOOTER_B, true);
     
-    SendablePIDController pidShooter = new SendablePIDController(0.0001, 0.0, 0.0, encShooter, shooterMotor);
+    ParsablePIDController pidShooter;
 
-    public ShooterSubsystem() {
+    public ShooterSubsystem(RobotCLI robotCLI) {
+        VariableContainer vc = robotCLI.getVariables().createContainer("shooterSubsystem");
+        
+        MAX_SHOOTER_ENCODER_RATE = vc.createInteger("maxShooterEncoderRate", 4000);
+        pidShooter = new ParsablePIDController("pidShooter", vc, 0.001, 0.0, 0.0, 0.0, 0.9, 50);
+        
         Arrays.sort(powerLookupTable, new Comparer() {
             public int compare(Object o1, Object o2) {
                 ExperimentalMeasurement one = (ExperimentalMeasurement)o1;
@@ -46,11 +53,9 @@ public class ShooterSubsystem extends Subsystem {
         encShooter.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encShooter.start();
         
-        pidShooter.setInputRange(0.0, MAX_SHOOTER_ENCODER_RATE); //I JUST CHANGED THE MIN FROM -MAX_SHOOTER_ENCODER_RATE to 0.0
-        pidShooter.setOutputRange(0.0, 1.0); //I JUST CHANGED THE MIN FROM -1.0 to 0.0
-        SmartDashboard.putData("PIDShooter", pidShooter);
-        
-        enablePID();
+        //pidShooter.setInputRange(0.0, Short.MAX_VALUE); //I JUST CHANGED THE MIN FROM -MAX_SHOOTER_ENCODER_RATE to 0.0
+        //pidShooter.setOutputRange(0.0, 1.0); //I JUST CHANGED THE MIN FROM -1.0 to 0.0
+        //SmartDashboard.putData("PIDShooter", pidShooter);
     }
     
     public void reset() {
@@ -59,21 +64,22 @@ public class ShooterSubsystem extends Subsystem {
     
     public void disable() {
         reset();
-        
-        disablePID();
     }
     
     public void enable() {
         reset();
-        
-        enablePID();
     }
     
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         setDefaultCommand(new ShooterCommand());
     }
+    //march7:
+    //148 3062(counts)
+    //97 2600
+    //155 2860
     
+    //end march7
     ExperimentalMeasurement[] powerLookupTable = {
         new ExperimentalMeasurement(0.0, 0.0),
         
@@ -115,34 +121,21 @@ public class ShooterSubsystem extends Subsystem {
         return 1.0;
     }
     
-    private void enablePID() {
-        if(!pidShooter.isEnable()) {
-            pidShooter.enable();
-        }
-    }
-    
-    private void disablePID() {
-        if(pidShooter.isEnable()) {
-            pidShooter.disable();
-        }
-    }
-    
     public boolean getShooterRunning() {
         return shooterMotor.get() != 0.0;
     }
     
     public void setSetpoint(double rate) {
-        if(pidShooter.isEnable()) {
-            pidShooter.setSetpoint(rate * MAX_SHOOTER_ENCODER_RATE);
-        } else {
-            shooterMotor.set(rate);
-        }
+        pidShooter.setInput(encShooter.getRate());
+        pidShooter.setSetpoint(rate * MAX_SHOOTER_ENCODER_RATE.get());
+        pidShooter.process();
+        shooterMotor.set(pidShooter.getOutput());
     }
     
     public void print() {
         System.out.print("(Shooter Subsystem)\n");
         
-        System.out.print("PIDShooter output: " + pidShooter.get() + " PIDShooter setpoint: " + pidShooter.getSetpoint() + " + EncShooter: " + encShooter.getRate() + "\n");
+        System.out.print("PIDShooter output: " + pidShooter.getOutput() + " PIDShooter setpoint: " + pidShooter.getSetpoint() + " + EncShooter: " + encShooter.getRate() + "\n");
     }
 }
 

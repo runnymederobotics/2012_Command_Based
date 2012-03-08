@@ -19,14 +19,13 @@ public class OI {
     final int OPERATOR_TOGGLE_MANUAL_SHOOTER = 4;
     
     final int OPERATOR_TOGGLE_MANUAL_ELEVATOR = 10;
+    final int OPERATOR_REVERSE_ELEVATOR_BUTTON = 12;
     
     final int OPERATOR_TOGGLE_MANUAL_TURRET = 9;
     final int OPERATOR_TURRET_INCREASE_BUTTON = 7;
     final int OPERATOR_TURRET_DECREASE_BUTTON = 11;
     final int OPERATOR_TURRET_LEFT_BUTTON = 5;
     final int OPERATOR_TURRET_RIGHT_BUTTON = 6;
-    
-    final double SPEED_INCREMENT = 0.01;
     
     public Joystick stickDriver = new Joystick(1);
     public Joystick stickOperator = new Joystick(2);
@@ -90,6 +89,10 @@ public class OI {
     public boolean getEnableElevatorToggle() {
         enableElevatorToggle.feed(stickOperator.getRawButton(OPERATOR_TOGGLE_MANUAL_ELEVATOR));
         return enableElevatorToggle.get();
+    }
+    
+    public boolean getReverseElevator() {
+        return stickOperator.getRawButton(OPERATOR_REVERSE_ELEVATOR_BUTTON);
     }
     
     public boolean getBallRelease() {

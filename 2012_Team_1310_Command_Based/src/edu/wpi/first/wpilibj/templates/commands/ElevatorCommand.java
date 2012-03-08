@@ -17,7 +17,7 @@ public class ElevatorCommand extends CommandBase {
     
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        elevatorSubsystem.runRoller(oi.getEnableElevatorToggle(), oi.getBallRelease());
+        elevatorSubsystem.runRoller(oi.getEnableElevatorToggle(), oi.getBallRelease(), oi.getReverseElevator());
         elevatorSubsystem.handleBallRelease(oi.getBallRelease(), shooterSubsystem.getShooterRunning());
     }
 

@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
+import RobotCLI.RobotCLI;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.OI;
@@ -15,19 +16,25 @@ public abstract class CommandBase extends Command {
 
     public static OI oi;
     // Create a single static instance of all of your subsystems
-    public static ChassisSubsystem chassisSubsystem = new ChassisSubsystem();
-    public static ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    public static ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
-    public static TurretSubsystem turretSubsystem = new TurretSubsystem();
-    public static BridgeTipSubsystem bridgeTipSubsystem = new BridgeTipSubsystem();
+    public static ChassisSubsystem chassisSubsystem;// = new ChassisSubsystem();
+    public static ShooterSubsystem shooterSubsystem;// = new ShooterSubsystem();
+    public static ElevatorSubsystem elevatorSubsystem;// = new ElevatorSubsystem();
+    public static TurretSubsystem turretSubsystem;// = new TurretSubsystem();
+    public static BridgeTipSubsystem bridgeTipSubsystem;// = new BridgeTipSubsystem();
     
-    public static void init() {
+    public static void init(RobotCLI robotCLI) {
         // This MUST be here. If the OI creates Commands (which it very likely
         // will), constructing it during the construction of CommandBase (from
         // which commands extend), subsystems are not guaranteed to be
         // yet. Thus, their requires() statements may grab null pointers. Bad
         // news. Don't move it.
         oi = new OI();
+        
+        chassisSubsystem = new ChassisSubsystem(robotCLI);
+        shooterSubsystem = new ShooterSubsystem(robotCLI);
+        elevatorSubsystem = new ElevatorSubsystem(robotCLI);
+        turretSubsystem = new TurretSubsystem(robotCLI);
+        bridgeTipSubsystem = new BridgeTipSubsystem(robotCLI);
 
         // Show what command your subsystem is running on the SmartDashboard
         SmartDashboard.putData(chassisSubsystem);

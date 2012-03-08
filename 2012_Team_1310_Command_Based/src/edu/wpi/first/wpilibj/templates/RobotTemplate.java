@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj.templates;
 import RobotCLI.RobotCLI;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -29,10 +31,11 @@ public class RobotTemplate extends IterativeRobot {
     
     private RobotCLI robotCLI;
     
-    Compressor compressor = new Compressor(RobotMap.COMPRESSOR_DI, 1);
+    Compressor compressor = new Compressor(RobotMap.COMPRESSOR_DI, RobotMap.COMPRESSOR_RELAY);
+    
+    Pneumatic cameraLightRelay = new Pneumatic(new Relay(RobotMap.CAMERA_LIGHT_RELAY));
     
     SendableChooser autonomousChooser = new SendableChooser();
-    
     Command autonomousCommand;
     
     public interface CommandCreator {
@@ -44,18 +47,19 @@ public class RobotTemplate extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-        // Initialize all subsystems
-        CommandBase.init();
-        
         try {
             if(robotCLI == null) {
                 robotCLI = new RobotCLI("1310", 10000);
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
         }
         
+        // Initialize all subsystems
+        CommandBase.init(robotCLI);
+
         compressor.start();
+        
+        cameraLightRelay.set(true);
 
         autonomousChooser.addDefault("Nothing", DriveDistanceCommand.creator(0));
         autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
