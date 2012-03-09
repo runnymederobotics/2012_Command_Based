@@ -29,6 +29,7 @@ public class DriveDistanceCommand extends CommandBase {
         
         System.out.println("DriveDistanceCommand encoderCounts = " + encoderCounts);
         this.encoderCounts = encoderCounts;
+        chassisSubsystem.reset();
     }
 
     // Called just before this Command runs the first time

@@ -111,6 +111,17 @@ public class ParsablePIDController extends VariableContainer {
             output.set(0);
         }
     }
+    
+    public void reset() {
+        this.outputP.set(0);
+        this.outputI.set(0);
+        this.sumI.set(0); 
+        this.outputD.set(0);
+        this.setpoint.set(0);
+        this.input.set(0);
+        this.error.set(0);
+        this.output.set(0);
+    }
 
     public void parseFrom(String value) {
         // TODO throw

@@ -67,7 +67,7 @@ public class RobotCLI extends Thread {
             this.owner = owner;
             this.name = name;
             if (owner != null) {
-                owner.variables.put(name, this);
+                owner.variables.put(owner.getPrefix() + name, this);
             }
         }
 
