@@ -36,8 +36,8 @@ public class RobotMap {
     public static final int TOP_BALL = 14;
     public static final int MIDDLE_BALL = 13;
     public static final int BOTTOM_BALL = 12;
-    public static final int TURRET_LEFT_LIMIT = 1;
-    public static final int TURRET_RIGHT_LIMIT = 2;
+    public static final int TURRET_LEFT_LIMIT = 2;
+    public static final int TURRET_RIGHT_LIMIT = 1;
     public static final int COMPRESSOR_DI = 9;
     
     public static final int GYRO_XY = 2;

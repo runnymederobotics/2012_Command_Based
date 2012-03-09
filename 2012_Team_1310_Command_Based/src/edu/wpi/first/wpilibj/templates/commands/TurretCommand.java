@@ -22,7 +22,7 @@ public class TurretCommand extends CommandBase {
         boolean canSeeTarget = CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
 
         if(DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle()) {
-            turretSubsystem.setRelativeAngleSetpoint(15 * oi.getManualTurretDirection());
+            turretSubsystem.setRelativeAngleSetpoint(turretSubsystem.SEARCH_ANGLE.get() * oi.getManualTurretDirection());
         } else {
             //turretSubsystem.enable();
             if(canSeeTarget && freshSequence[0]) {
@@ -30,8 +30,7 @@ public class TurretCommand extends CommandBase {
             } else if(canSeeTarget && !freshSequence[0]) {
                 //Do nothing
             } else if(!canSeeTarget && freshSequence[0]) {
-                //TODO: get EP to get their shit together and put DigitalInputs on the turret
-                //turretSubsystem.searchForTarget(oi.getManualTurretDirection());
+                turretSubsystem.searchForTarget(oi.getManualTurretDirection());
             }
         }
         turretSubsystem.execute();

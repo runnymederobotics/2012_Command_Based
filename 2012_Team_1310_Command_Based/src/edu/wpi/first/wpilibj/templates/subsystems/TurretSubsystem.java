@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj.templates.subsystems;
 
 import RobotCLI.Parsable.ParsableDouble;
+import RobotCLI.Parsable.ParsableInteger;
 import RobotCLI.RobotCLI;
 import RobotCLI.RobotCLI.VariableContainer;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -17,6 +18,8 @@ public class TurretSubsystem extends Subsystem {
 
     public static final int SEARCH_RIGHT = 1;
     public static final int SEARCH_LEFT = -1;
+    
+    public ParsableInteger SEARCH_ANGLE;
     
     //static final double PID_P = 0.05, PID_I = 0.000, PID_D = 0.0;
     ParsableDouble COUNTS_PER_DEGREE;
@@ -45,11 +48,12 @@ public class TurretSubsystem extends Subsystem {
     public TurretSubsystem(RobotCLI robotCLI) {
         VariableContainer vc = robotCLI.getVariables().createContainer("turretSubsystem");
         
+        SEARCH_ANGLE = vc.createInteger("searchAngle", 10);
         COUNTS_PER_DEGREE = vc.createDouble("countsPerDegree", 9.18);
-        TOLERANCE = vc.createDouble("tolerance", 2);
-        TURRET_SPEED_LEFT = vc.createDouble("turretSpeedLeft", 0.05);
-        TURRET_SPEED_RIGHT = vc.createDouble("turretSpeedRight", 0.1);
-        SLOW_TURRET_RANGE = vc.createDouble("slowTurretRange", 20);
+        TOLERANCE = vc.createDouble("tolerance", 1);
+        TURRET_SPEED_LEFT = vc.createDouble("turretSpeedLeft", 0.2);
+        TURRET_SPEED_RIGHT = vc.createDouble("turretSpeedRight", 0.3);
+        SLOW_TURRET_RANGE = vc.createDouble("slowTurretRange", 8);
         
         encTurret.start();
         encTurret.setPIDSourceParameter(Encoder.PIDSourceParameter.kDistance);
@@ -92,9 +96,9 @@ public class TurretSubsystem extends Subsystem {
         output = 0;
         final int error = currentSpot - setPoint;
         if(error >= COUNTS_PER_DEGREE.get() * TOLERANCE.get()) {
-            output = -TURRET_SPEED_LEFT.get();
+            output = TURRET_SPEED_LEFT.get();
         } else if(error <= COUNTS_PER_DEGREE.get() * -TOLERANCE.get()) {
-            output = TURRET_SPEED_RIGHT.get();
+            output = -TURRET_SPEED_RIGHT.get();
         }
         if((rightLimit.get() && output < 0)
            || (leftLimit.get() && output > 0)) {
@@ -148,7 +152,7 @@ public class TurretSubsystem extends Subsystem {
         }
         
         turretMotor.set(speed);
-    }
+    }*/
    
     
     public void searchForTarget(int requestedDirection) {
@@ -160,19 +164,20 @@ public class TurretSubsystem extends Subsystem {
             } else if(searchDirection == SEARCH_RIGHT && rightLimit.get()) {
                 searchDirection = 0;
             }
-        } else {
+        }/* else {
             if(leftLimit.get()) {
                 searchDirection = SEARCH_RIGHT;
             } else if(rightLimit.get()) {
                 searchDirection = SEARCH_LEFT;
             }
-        }
-        setRelativeAngleSetpoint(searchDirection);
-    }*/
+        }*/
+        setRelativeAngleSetpoint(searchDirection * SEARCH_ANGLE.get());
+    }
     
     public void print() {
         System.out.print("(Turret Subsystem)\n");
         System.out.print("setPoint (counts): " + setPoint + " setPoint (relative degrees): " + ((setPoint - encTurret.get()) / COUNTS_PER_DEGREE.get()) + " current: " + encTurret.get() + " output: " + output + " onTarget: " + onTarget() + " error: " + (encTurret.get() - setPoint) + "\n");
+        System.out.print("leftLimit: " + leftLimit.get() + " rightLimit: " + rightLimit.get() + "\n");
         //System.out.print("PIDTurret output: " + pidTurret.get() + " PIDTurret setpoint: " + pidTurret.getSetpoint() + " encTurret: " + encTurret.get() + "\n");
     }
 }
