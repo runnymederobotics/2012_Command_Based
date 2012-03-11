@@ -34,16 +34,16 @@ public class ShooterCommand extends CommandBase {
             
             if(DriverStation.getInstance().isOperatorControl() && oi.getManualShooterToggle()) {
                 double manualSpeed = oi.getManualShooterSpeed();
-                shooterSubsystem.setSetpoint(manualSpeed);
+                shooterSubsystem.setSetpoint(manualSpeed * shooterSubsystem.MAX_SHOOTER_ENCODER_RATE.get());
             } else {
                 boolean canSeeTarget = CameraSystem.getTargetDistance(readerSequenceNumber, targetDistance, freshSequence);
 
                 if(canSeeTarget && freshSequence[0]) {
-                    shooterSubsystem.setSetpoint(shooterSubsystem.getPowerFromDistance(targetDistance[0]));
+                    shooterSubsystem.setSetpoint(shooterSubsystem.getSetpointFromDistance(targetDistance[0]));
                 }
             }
         } else {
-            shooterSubsystem.setSetpoint(IDLE_SPEED);
+            shooterSubsystem.setSetpoint(IDLE_SPEED * shooterSubsystem.MAX_SHOOTER_ENCODER_RATE.get());
         }
     }
 

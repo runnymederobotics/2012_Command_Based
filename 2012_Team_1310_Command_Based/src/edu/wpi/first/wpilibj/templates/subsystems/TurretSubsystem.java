@@ -22,8 +22,8 @@ public class TurretSubsystem extends Subsystem {
     public static final int SEARCH_LEFT = 1;
     
     public ParsableInteger SEARCH_ANGLE;
-    
     ParsableDouble COUNTS_PER_DEGREE;
+    public ParsableDouble CAMERA_ERROR;
     
     Jaguar turretMotor = new Jaguar(RobotMap.TURRET_MOTOR);
     
@@ -43,7 +43,8 @@ public class TurretSubsystem extends Subsystem {
         
         SEARCH_ANGLE = vc.createInteger("searchAngle", 10);
         COUNTS_PER_DEGREE = vc.createDouble("countsPerDegree", 9.18);
-
+        CAMERA_ERROR = vc.createDouble("cameraError", 2.5);
+        
         pidTurret = new ParsablePIDController("pidTurret", robotCLI.getVariables(), 0.01, 0.00001, 0.0, -0.5, 0.5, 8.75);
         
         encTurret.start();

@@ -67,11 +67,13 @@ public class ElevatorSubsystem extends Subsystem {
     double releaseTime = 0.0;
     double retractTime = 0.0;
     
-    public void handleBallRelease(boolean shootRequest, boolean shooterRunning) {
+    public void handleBallRelease(boolean shootRequest, boolean forceShot, boolean shooterRunningAndOnTarget) {
         double now = Timer.getFPGATimestamp();
         
         //TODO: add condition for topBall being true?
-        if(now - retractTime > RECOVER_TIME.get() && shootRequest && elevatorRunning() && shooterRunning) {
+        boolean readyToShoot = elevatorRunning() && shooterRunningAndOnTarget;
+
+        if(now - retractTime > RECOVER_TIME.get() && shootRequest && (readyToShoot || forceShot)) {
             if(!releasingBall) { //If we werent previously releasing
                 releaseTime = now;
                 ballRelease.set(RELEASE_VALUE);

@@ -27,8 +27,11 @@ public class TurretCommand extends CommandBase {
             turretSubsystem.setCameraLight(false); //Turn off camera in manual mode
         } else {
             //turretSubsystem.enable();
+            
+            double relativeAngleSetpoint = -targetAngle[0] + turretSubsystem.CAMERA_ERROR.get();
+            
             if(canSeeTarget && freshSequence[0]) {
-                turretSubsystem.setRelativeAngleSetpoint(-targetAngle[0]);
+                turretSubsystem.setRelativeAngleSetpoint(relativeAngleSetpoint);
             } else if(canSeeTarget && !freshSequence[0]) {
                 //Do nothing
             } else if(!canSeeTarget && freshSequence[0]) {

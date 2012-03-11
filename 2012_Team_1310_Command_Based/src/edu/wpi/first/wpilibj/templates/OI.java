@@ -15,6 +15,7 @@ public class OI {
     final int DRIVER_TOGGLE_BRIDGE_TIPPER = 6;
     
     final int OPERATOR_BALL_RELEASE = 1;
+    final int OPERATOR_FORCE_SHOT = 2;
     
     final int OPERATOR_TOGGLE_MANUAL_SHOOTER = 4;
     
@@ -97,6 +98,10 @@ public class OI {
     
     public boolean getBallRelease() {
         return stickOperator.getRawButton(OPERATOR_BALL_RELEASE);
+    }
+    
+    public boolean getForceShot() {
+        return stickOperator.getRawButton(OPERATOR_FORCE_SHOT);
     }
     
     public boolean getManualTurretToggle() {
