@@ -20,18 +20,21 @@ public class TurretCommand extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         boolean canSeeTarget = CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
-
+        double manualSetpoint = turretSubsystem.SEARCH_ANGLE.get() * oi.getManualTurretDirection();
+        
         if(DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle()) {
-            turretSubsystem.setRelativeAngleSetpoint(turretSubsystem.SEARCH_ANGLE.get() * oi.getManualTurretDirection());
+            turretSubsystem.setRelativeAngleSetpoint(manualSetpoint);
+            turretSubsystem.setCameraLight(false); //Turn off camera in manual mode
         } else {
             //turretSubsystem.enable();
             if(canSeeTarget && freshSequence[0]) {
-                turretSubsystem.setRelativeAngleSetpoint(targetAngle[0]);
+                turretSubsystem.setRelativeAngleSetpoint(-targetAngle[0]);
             } else if(canSeeTarget && !freshSequence[0]) {
                 //Do nothing
             } else if(!canSeeTarget && freshSequence[0]) {
-                turretSubsystem.searchForTarget(oi.getManualTurretDirection());
+                turretSubsystem.setRelativeAngleSetpoint(manualSetpoint);
             }
+            turretSubsystem.setCameraLight(true); //Turn off camera in manual mode
         }
         turretSubsystem.execute();
     }

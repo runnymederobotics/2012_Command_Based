@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableGyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.templates.CountEncoder;
 import edu.wpi.first.wpilibj.templates.OutputStorage;
 import edu.wpi.first.wpilibj.templates.Pneumatic;
 import edu.wpi.first.wpilibj.templates.RobotMap;
@@ -23,6 +22,8 @@ import edu.wpi.first.wpilibj.templates.commands.DriveCommand;
 public class ChassisSubsystem extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
+    
+    public final boolean USE_AUTO_TRANS = false;
     
     final double PID_COUNT_MAX_INPUT = Short.MAX_VALUE;
     final double PID_COUNT_MIN_INPUT = -Short.MAX_VALUE;
@@ -64,8 +65,9 @@ public class ChassisSubsystem extends Subsystem {
     ParsablePIDController pidRightCount;// = new SendablePIDController(PID_COUNT_P, PID_COUNT_I, PID_COUNT_D, encRightCount, pidRightCountStorage);
     
     Pneumatic transShift = new Pneumatic(new DoubleSolenoid(1, 2));
-
-    //double maxEncoderRate = MAX_LOW_ENCODER_RATE;
+    
+    boolean usePID = true;
+    boolean usePIDCount = false;
     
     public ChassisSubsystem(RobotCLI robotCLI) {
         VariableContainer vc = robotCLI.getVariables().createContainer("chassisSubsystem");
@@ -83,17 +85,9 @@ public class ChassisSubsystem extends Subsystem {
         pidRight = new ParsablePIDController("pidRight", robotCLI.getVariables(), 0.0, 0.0025, 0.0, -1.0, 1.0, 50);
         pidLeftCount = new ParsablePIDController("pidLeftCount", robotCLI.getVariables(), 0.05, 0.0, 0.0, -0.5, 0.5, 50);
         pidRightCount = new ParsablePIDController("pidRightCount", robotCLI.getVariables(), 0.05, 0.0, 0.0, -0.5, 0.5, 50);
-        
-        //encLeft.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
-        //encRight.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
+
         encLeft.start();
         encRight.start();
-        
-        //pidLeft.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
-        //pidLeft.setOutputRange(-1.0, 1.0);
-        
-        //pidRight.setInputRange(-Short.MAX_VALUE, Short.MAX_VALUE);
-        //pidRight.setOutputRange(-1.0, 1.0);
         
         gyroXY.reset();
         gyroYZ.reset();
@@ -102,22 +96,10 @@ public class ChassisSubsystem extends Subsystem {
         pidGyro.setContinuous();
         pidGyro.setInputRange(-180, 180);
         pidGyro.setOutputRange(-PID_GYRO_MAX_OUTPUT.get(), PID_GYRO_MAX_OUTPUT.get());
- 
-        /*pidLeftCount.setTolerance(PID_COUNT_TOLERANCE.get() / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
-        pidLeftCount.setInputRange(PID_COUNT_MIN_INPUT, PID_COUNT_MAX_INPUT);
-        pidLeftCount.setOutputRange(-PID_COUNT_MAX_OUTPUT.get(), PID_COUNT_MAX_OUTPUT.get());
 
-        pidRightCount.setTolerance(PID_COUNT_TOLERANCE.get() / (PID_COUNT_MAX_INPUT - PID_COUNT_MIN_INPUT));
-        pidRightCount.setInputRange(PID_COUNT_MIN_INPUT, PID_COUNT_MAX_INPUT);
-        pidRightCount.setOutputRange(-PID_COUNT_MAX_OUTPUT.get(), PID_COUNT_MAX_OUTPUT.get());*/
-        
-        //SmartDashboard.putData("PIDLeft", pidLeft);
-        //SmartDashboard.putData("PIDRight", pidRight);
         SmartDashboard.putData("XYGyro", gyroXY);
         SmartDashboard.putData("YZGyro", gyroYZ);
         SmartDashboard.putData("PIDGyro", pidGyro);
-        //SmartDashboard.putData("PIDLeftCount", pidLeftCount);
-        //SmartDashboard.putData("PIDRightCount", pidRightCount);
     }
     
     public void reset() {
@@ -154,19 +136,18 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void disablePID() {
-        /*if(pidLeft.isEnable() || pidRight.isEnable()) {
-            pidLeft.disable();
-            pidRight.disable();
-        }*/
+        if(usePID) {
+            reset();
+        }
+        usePID = false;
     }
     
     public void disablePIDCount() {
-        /*if(pidLeftCount.isEnable() || pidRightCount.isEnable()) {
-            pidLeftCount.setSetpoint(0.0);
-            pidRightCount.setSetpoint(0.0);
-            pidLeftCount.disable();
-            pidRightCount.disable();
-        }*/
+        usePIDCount = false;
+        encLeft.reset();
+        encRight.reset();
+        pidLeftCount.reset();
+        pidLeftCount.reset();
     }
     
     public void disablePIDGyro() {
@@ -176,19 +157,20 @@ public class ChassisSubsystem extends Subsystem {
     }
 
     public void enablePID() {
-        /*if(!pidLeft.isEnable() || !pidRight.isEnable()) {
-            pidLeft.enable();
-            pidRight.enable();
-        }*/
+        if(!usePID) {
+            reset();
+        }
+        usePID = true;
     }
     
     public void enablePIDCount() {
-        /*if(!pidLeftCount.isEnable() || !pidRightCount.isEnable()) {
+        if(!usePIDCount) {
             encLeft.reset();
             encRight.reset();
-            pidLeftCount.enable();
-            pidRightCount.enable();
-        }*/
+            pidLeftCount.reset();
+            pidLeftCount.reset();
+        }
+        usePIDCount = true;
     }
     
     public void enablePIDGyro() {
@@ -230,19 +212,16 @@ public class ChassisSubsystem extends Subsystem {
     
     public void goToCountSetpoint() {
         robotDrive.arcadeDrive(0.0, 0.0); //Keep robotDrive updated
-        if(reachedCountSetpoint()) {
-            disablePIDCount();
-        } else {
-            pidLeftCount.setInput(-encLeft.getDistance());
-            pidRightCount.setInput(encRight.getDistance());
-            
-            pidLeftCount.process();
-            pidRightCount.process();
-            
-            motorLeft.set(-pidLeftCount.getOutput());
-            motorRight.set(pidRightCount.getOutput());
-            //setSetpoint(-pidLeftCount.getOutput(), pidRightCount.getOutput(), false); //Dont allow high speed
-        }
+        
+        pidLeftCount.setInput(-encLeft.getDistance());
+        pidRightCount.setInput(encRight.getDistance());
+
+        pidLeftCount.process();
+        pidRightCount.process();
+
+        motorLeft.set(-pidLeftCount.getOutput());
+        motorRight.set(pidRightCount.getOutput());
+        //setSetpoint(-pidLeftCount.getOutput(), pidRightCount.getOutput(), false); //Dont allow high speed
     }
     
     public void goToAngleSetpoint() {
@@ -274,7 +253,7 @@ public class ChassisSubsystem extends Subsystem {
         double leftSetpoint;
         double rightSetpoint;
         
-        if(autoTrans) {
+        if(USE_AUTO_TRANS && autoTrans) {
             //Right rate - left rate because left rate is negative
             final double rate = Math.abs(encRight.getRate() - encLeft.getRate()) / 2; //Average rate
              
@@ -295,17 +274,22 @@ public class ChassisSubsystem extends Subsystem {
             rightSetpoint = right * (transShift.get() ? MAX_HIGH_ENCODER_RATE.get() : MAX_LOW_ENCODER_RATE.get());
         }
         
-        pidLeft.setSetpoint(leftSetpoint);
-        pidRight.setSetpoint(rightSetpoint);
-        
-        pidLeft.setInput(encLeft.getRate());
-        pidRight.setInput(encRight.getRate());
-        
-        pidLeft.process();
-        pidRight.process();
-        
-        motorLeft.set(pidLeft.getOutput());
-        motorRight.set(pidRight.getOutput());
+        if(usePID) {
+            pidLeft.setSetpoint(leftSetpoint);
+            pidRight.setSetpoint(rightSetpoint);
+
+            pidLeft.setInput(encLeft.getRate());
+            pidRight.setInput(encRight.getRate());
+
+            pidLeft.process();
+            pidRight.process();
+
+            motorLeft.set(pidLeft.getOutput());
+            motorRight.set(pidRight.getOutput());
+        } else {
+            motorLeft.set(left);
+            motorRight.set(right);
+        }
     }
     
     public void print() {

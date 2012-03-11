@@ -14,13 +14,19 @@ public class DriveCommand extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         boolean allowAutoShift = false;
-        if(oi.getLowGearButton()) {
-            chassisSubsystem.transShift(false);
-        } else if(oi.getHighGearButton()) {
-            chassisSubsystem.transShift(true);
+        
+        if(chassisSubsystem.USE_AUTO_TRANS) {
+            if(oi.getLowGearButton()) {
+                chassisSubsystem.transShift(false);
+            } else if(oi.getHighGearButton()) {
+                chassisSubsystem.transShift(true);
+            } else {
+                //Dont allow autoshift unless we havent pressed one of the manual shift buttons
+                allowAutoShift = true;
+            }
         } else {
-            //Dont allow autoshift unless we havent pressed one of the manual shift buttons
-            allowAutoShift = true;
+            //Only go into high gear when we are pressing the button
+            chassisSubsystem.transShift(oi.getHighGearButton());
         }
         
         if(oi.getAutoBalanceToggle()) {

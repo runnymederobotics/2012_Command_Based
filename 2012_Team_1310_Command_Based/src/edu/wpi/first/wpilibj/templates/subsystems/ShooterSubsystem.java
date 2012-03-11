@@ -28,7 +28,7 @@ public class ShooterSubsystem extends Subsystem {
         VariableContainer vc = robotCLI.getVariables().createContainer("shooterSubsystem");
         
         MAX_SHOOTER_ENCODER_RATE = vc.createInteger("maxShooterEncoderRate", 4000);
-        pidShooter = new ParsablePIDController("pidShooter", vc, 0.001, 0.0, 0.0, 0.0, 0.9, 50);
+        pidShooter = new ParsablePIDController("pidShooter", robotCLI.getVariables(), 0.004, 0.0, 0.0, 0.0, 0.9, 50);
         
         Arrays.sort(powerLookupTable, new Comparer() {
             public int compare(Object o1, Object o2) {
@@ -52,10 +52,6 @@ public class ShooterSubsystem extends Subsystem {
         
         encShooter.setPIDSourceParameter(Encoder.PIDSourceParameter.kRate);
         encShooter.start();
-        
-        //pidShooter.setInputRange(0.0, Short.MAX_VALUE); //I JUST CHANGED THE MIN FROM -MAX_SHOOTER_ENCODER_RATE to 0.0
-        //pidShooter.setOutputRange(0.0, 1.0); //I JUST CHANGED THE MIN FROM -1.0 to 0.0
-        //SmartDashboard.putData("PIDShooter", pidShooter);
     }
     
     public void reset() {

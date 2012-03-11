@@ -10,8 +10,6 @@ package edu.wpi.first.wpilibj.templates;
 import RobotCLI.RobotCLI;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -32,8 +30,6 @@ public class RobotTemplate extends IterativeRobot {
     private RobotCLI robotCLI;
     
     Compressor compressor = new Compressor(RobotMap.COMPRESSOR_DI, RobotMap.COMPRESSOR_RELAY);
-    
-    Pneumatic cameraLightRelay = new Pneumatic(new Relay(RobotMap.CAMERA_LIGHT_RELAY));
     
     SendableChooser autonomousChooser = new SendableChooser();
     Command autonomousCommand;
@@ -59,8 +55,6 @@ public class RobotTemplate extends IterativeRobot {
 
         compressor.start();
         
-        cameraLightRelay.set(true);
-
         autonomousChooser.addDefault("Nothing", DriveDistanceCommand.creator(0));
         autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip", ShootTipCommandGroup.creator());
