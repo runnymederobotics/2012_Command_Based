@@ -29,6 +29,8 @@ public class OI {
     final int OPERATOR_TURRET_LEFT_BUTTON = 5;
     final int OPERATOR_TURRET_RIGHT_BUTTON = 6;
     
+    final int OPERATOR_LIGHT_SWITCH = 3;
+    
     public Joystick stickDriver = new Joystick(1);
     public Joystick stickOperator = new Joystick(2);
 
@@ -38,6 +40,7 @@ public class OI {
     Toggle manualShooterToggle = new Toggle(false);
     Toggle disableElevatorToggle = new Toggle(false);
     Toggle manualTurretToggle = new Toggle(false);
+    Toggle lightSwitchToggle = new Toggle(true);
     
     /*        DRIVER        */
     
@@ -106,6 +109,11 @@ public class OI {
     
     public boolean getForceShot() {
         return stickOperator.getRawButton(OPERATOR_FORCE_SHOT);
+    }
+    
+    public boolean getLightSwitch() {
+        lightSwitchToggle.feed(stickOperator.getRawButton(OPERATOR_LIGHT_SWITCH));
+        return lightSwitchToggle.get();
     }
     
     public boolean getManualTurretToggle() {

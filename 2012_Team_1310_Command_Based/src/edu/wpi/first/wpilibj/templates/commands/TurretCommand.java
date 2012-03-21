@@ -23,8 +23,10 @@ public class TurretCommand extends CommandBase {
         double manualSetpoint = turretSubsystem.SEARCH_ANGLE.get() * oi.getManualTurretDirection();
         
         if(DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle()) {
-            turretSubsystem.setRelativeAngleSetpoint(manualSetpoint);
-            turretSubsystem.setCameraLight(false); //Turn off camera in manual mode
+            turretSubsystem.manualMode(manualSetpoint);
+            //turretSubsystem.setRelativeAngleSetpoint(manualSetpoint);
+            //turretSubsystem.execute();
+            turretSubsystem.setCameraLight(oi.getLightSwitch()); //Turn off camera in manual mode
         } else {
             //turretSubsystem.enable();
             
@@ -38,8 +40,9 @@ public class TurretCommand extends CommandBase {
                 turretSubsystem.setRelativeAngleSetpoint(manualSetpoint);
             }
             turretSubsystem.setCameraLight(true); //Turn off camera in manual mode
+            turretSubsystem.execute();
         }
-        turretSubsystem.execute();
+        
     }
 
     // Make this return true when this Command no longer needs to run execute()

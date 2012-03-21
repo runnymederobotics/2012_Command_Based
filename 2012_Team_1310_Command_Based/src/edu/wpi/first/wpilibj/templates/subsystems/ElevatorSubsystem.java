@@ -32,6 +32,10 @@ public class ElevatorSubsystem extends Subsystem {
     DigitalInput middleBall = new DigitalInput(RobotMap.MIDDLE_BALL);
     DigitalInput bottomBall = new DigitalInput(RobotMap.BOTTOM_BALL);
     
+    boolean lastBottomBall = false;
+    boolean lastMiddleBall = false;
+    boolean lastTopBall = false;
+
     Pneumatic ballRelease = new Pneumatic(new DoubleSolenoid(RobotMap.ELEVATOR_BALL_RELEASE_ONE, RobotMap.ELEVATOR_BALL_RELEASE_TWO));
     
     NetworkTable ballCounter = NetworkTable.getTable("1310BallCounter");
@@ -60,11 +64,17 @@ public class ElevatorSubsystem extends Subsystem {
     
     public void updateDashboard() {
         //Update our ball counter on the dashboard
-        ballCounter.beginTransaction();
-        ballCounter.putBoolean("BottomBall", !bottomBall.get());
-        ballCounter.putBoolean("MiddleBall", !middleBall.get());
-        ballCounter.putBoolean("TopBall", !topBall.get());
-        ballCounter.endTransaction();
+        if(bottomBall.get() != lastBottomBall || middleBall.get() != lastMiddleBall || topBall.get() != lastTopBall) {
+            ballCounter.beginTransaction();
+            ballCounter.putBoolean("BottomBall", !bottomBall.get());
+            ballCounter.putBoolean("MiddleBall", !middleBall.get());
+            ballCounter.putBoolean("TopBall", !topBall.get());
+            ballCounter.endTransaction();
+        }
+        
+        lastBottomBall = topBall.get();
+        lastMiddleBall = topBall.get();
+        lastTopBall = topBall.get();
     }
     
     public boolean getBottomBall() {

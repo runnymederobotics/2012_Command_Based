@@ -25,6 +25,7 @@ public class TurretSubsystem extends Subsystem {
     public ParsableDouble COUNTS_PER_DEGREE;
     public ParsableDouble CAMERA_ERROR;
     public ParsableDouble NEW_SETPOINT_TOLERANCE;
+    ParsableDouble MANUAL_MODE_SPEED;
     
     Jaguar turretMotor = new Jaguar(RobotMap.TURRET_MOTOR);
     
@@ -44,8 +45,9 @@ public class TurretSubsystem extends Subsystem {
         
         SEARCH_ANGLE = vc.createInteger("searchAngle", 10);
         COUNTS_PER_DEGREE = vc.createDouble("countsPerDegree", 9.18);
-        CAMERA_ERROR = vc.createDouble("cameraError", 0.0); //Was 2.5
+        CAMERA_ERROR = vc.createDouble("cameraError", 2.5); //Was 2.5
         NEW_SETPOINT_TOLERANCE = vc.createDouble("newSetpointTolerance", 18.36);
+        MANUAL_MODE_SPEED = vc.createDouble("manualModeSpeed", 0.5);
         
         pidTurret = new ParsablePIDController("pidTurret", robotCLI.getVariables(), 0.005, 0.00001, 0.0, -0.5, 0.5, 8.75);
         
@@ -90,6 +92,15 @@ public class TurretSubsystem extends Subsystem {
         }
         
         turretMotor.set(output);
+    }
+    
+    public void manualMode(double output) {
+        if((rightLimit.get() && output < 0)
+           || (leftLimit.get() && output > 0)) {
+            output = 0;
+        }
+        turretMotor.set(output * MANUAL_MODE_SPEED.get());
+        reset();
     }
     
     public void setRelativeAngleSetpoint(double angle) {
