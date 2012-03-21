@@ -22,8 +22,9 @@ public class TurretSubsystem extends Subsystem {
     public static final int SEARCH_LEFT = 1;
     
     public ParsableInteger SEARCH_ANGLE;
-    ParsableDouble COUNTS_PER_DEGREE;
+    public ParsableDouble COUNTS_PER_DEGREE;
     public ParsableDouble CAMERA_ERROR;
+    public ParsableDouble NEW_SETPOINT_TOLERANCE;
     
     Jaguar turretMotor = new Jaguar(RobotMap.TURRET_MOTOR);
     
@@ -43,9 +44,10 @@ public class TurretSubsystem extends Subsystem {
         
         SEARCH_ANGLE = vc.createInteger("searchAngle", 10);
         COUNTS_PER_DEGREE = vc.createDouble("countsPerDegree", 9.18);
-        CAMERA_ERROR = vc.createDouble("cameraError", 2.5);
+        CAMERA_ERROR = vc.createDouble("cameraError", 0.0); //Was 2.5
+        NEW_SETPOINT_TOLERANCE = vc.createDouble("newSetpointTolerance", 18.36);
         
-        pidTurret = new ParsablePIDController("pidTurret", robotCLI.getVariables(), 0.01, 0.00001, 0.0, -0.5, 0.5, 8.75);
+        pidTurret = new ParsablePIDController("pidTurret", robotCLI.getVariables(), 0.005, 0.00001, 0.0, -0.5, 0.5, 8.75);
         
         encTurret.start();
         encTurret.setPIDSourceParameter(Encoder.PIDSourceParameter.kDistance);
@@ -69,6 +71,10 @@ public class TurretSubsystem extends Subsystem {
         reset();
     }
     
+    public boolean onTarget() {
+        return pidTurret.onTarget();
+    }
+    
     public void setCameraLight(boolean value) {
         cameraLight.set(value);
     }
@@ -87,8 +93,11 @@ public class TurretSubsystem extends Subsystem {
     }
     
     public void setRelativeAngleSetpoint(double angle) {
-        if(angle != 0 && (pidTurret.onTarget() || leftLimit.get() || rightLimit.get())) {
+        boolean onTarget = Math.abs(pidTurret.getError()) < NEW_SETPOINT_TOLERANCE.get();
+        
+        if(angle != 0 && (onTarget || leftLimit.get() || rightLimit.get())) {
             //setPoint = encTurret.get() + (int)(angle * COUNTS_PER_DEGREE.get());
+            //pidTurret.reset();
             pidTurret.setSetpoint(encTurret.get() + angle * COUNTS_PER_DEGREE.get());
         }
     }

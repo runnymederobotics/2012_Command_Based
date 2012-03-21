@@ -15,7 +15,11 @@ public class ManualBridgeTipCommand extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         if(DriverStation.getInstance().isOperatorControl()) {
-            bridgeTipSubsystem.set(oi.getBridgeTipperToggle());
+            bridgeTipSubsystem.set(oi.getBridgeTipperOverride(), oi.getBridgeTipperButton());
+        } else {
+            boolean override = false;
+            boolean request = false;
+            bridgeTipSubsystem.set(override, request);
         }
     }
 

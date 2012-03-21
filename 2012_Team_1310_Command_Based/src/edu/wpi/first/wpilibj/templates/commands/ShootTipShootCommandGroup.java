@@ -6,20 +6,22 @@ import edu.wpi.first.wpilibj.templates.RobotTemplate;
 
 public class ShootTipShootCommandGroup extends CommandGroup {
     
-    public ShootTipShootCommandGroup() {
-        //addSequential(new AutonomousShootCommand());
-        addSequential(new DriveDistanceCommand(-1000)); //Drive backwards
-        addSequential(new RotateCommand(180)); //Rotate to face the bridge
-        addSequential(new BridgeTipDownCommand()); //Tip the bridge
-    }
-    
     static class Creator implements RobotTemplate.CommandCreator {
         public Command create() {
-            return new ShootTipCommandGroup();
+            return new ShootTipShootCommandGroup();
         }
     }
     
     public static RobotTemplate.CommandCreator creator() {
         return new Creator();
+    }
+    
+    public ShootTipShootCommandGroup() {
+        addSequential(new AutonomousShootCommand(false)); //Shoot all our balls
+        addSequential(new BridgeTipDownCommand()); //Lower the bridge tipper
+        addSequential(new DriveDistanceCommand(1000)); //Drive towards the bridge (a condition for this stopping is if the YZ gyro has a reading)
+        addSequential(new WaitForBallCommand());
+        addSequential(new DriveDistanceCommand(-1000));
+        addSequential(new AutonomousShootCommand(false)); //Shoot all our balls
     }
 }

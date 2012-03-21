@@ -14,6 +14,8 @@ public class RobotMap {
     public static final int SHOOTER_MOTOR = 3;
     public static final int ELEVATOR_MOTOR = 4;
     public static final int TURRET_MOTOR = 6;
+    public static final int BRIDGE_TIP_LOCK_RIGHT = 9;
+    public static final int BRIDGE_TIP_LOCK_LEFT = 10;
     
     public static final int COMPRESSOR_RELAY = 1;
     public static final int CAMERA_LIGHT_RELAY = 2;

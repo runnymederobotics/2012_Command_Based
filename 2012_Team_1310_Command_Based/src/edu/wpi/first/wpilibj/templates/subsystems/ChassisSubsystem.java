@@ -83,8 +83,8 @@ public class ChassisSubsystem extends Subsystem {
         
         pidLeft = new ParsablePIDController("pidLeft", robotCLI.getVariables(), 0.0, 0.0025, 0.0, -1.0, 1.0, 50);
         pidRight = new ParsablePIDController("pidRight", robotCLI.getVariables(), 0.0, 0.0025, 0.0, -1.0, 1.0, 50);
-        pidLeftCount = new ParsablePIDController("pidLeftCount", robotCLI.getVariables(), 0.05, 0.0, 0.0, -0.5, 0.5, 50);
-        pidRightCount = new ParsablePIDController("pidRightCount", robotCLI.getVariables(), 0.05, 0.0, 0.0, -0.5, 0.5, 50);
+        pidLeftCount = new ParsablePIDController("pidLeftCount", robotCLI.getVariables(), 0.00075, 0.0, 0.0, -0.5, 0.5, 50);
+        pidRightCount = new ParsablePIDController("pidRightCount", robotCLI.getVariables(), 0.00075, 0.0, 0.0, -0.5, 0.5, 50);
 
         encLeft.start();
         encRight.start();
@@ -143,11 +143,13 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void disablePIDCount() {
+        if(usePIDCount) {
+            encLeft.reset();
+            encRight.reset();
+            pidLeftCount.reset();
+            pidLeftCount.reset();
+        }
         usePIDCount = false;
-        encLeft.reset();
-        encRight.reset();
-        pidLeftCount.reset();
-        pidLeftCount.reset();
     }
     
     public void disablePIDGyro() {
@@ -195,8 +197,8 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void setCountSetpoint(int encoderCounts) {
+        disablePID();
         enablePIDCount();
-        //enablePID();
         
         pidLeftCount.setSetpoint(encoderCounts);
         pidRightCount.setSetpoint(encoderCounts);
@@ -211,6 +213,14 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void goToCountSetpoint() {
+        System.out.println("Going to count setpoint: left: " + pidLeftCount.getSetpoint() + " right: " + pidRightCount.getSetpoint());
+        System.out.println("left: " + encLeft.getDistance() + " right: " + encRight.getDistance());
+        
+        //Make sure pidCount is the only thing using the wheels
+        disablePID();
+        disablePIDGyro();
+        enablePIDCount();
+        
         robotDrive.arcadeDrive(0.0, 0.0); //Keep robotDrive updated
         
         pidLeftCount.setInput(-encLeft.getDistance());
@@ -225,6 +235,11 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public void goToAngleSetpoint() {
+        //Make sure pidGyro is the only thing using the wheels
+        disablePID();
+        enablePIDGyro();
+        disablePIDCount();
+        
         if(pidGyro.onTarget()) {
             disablePIDGyro();
         } else {
@@ -233,10 +248,10 @@ public class ChassisSubsystem extends Subsystem {
     }
     
     public boolean reachedCountSetpoint() {
-        double leftError = Math.abs(pidLeftCount.getSetpoint() - encLeft.get());
-        double rightError = Math.abs(pidRightCount.getSetpoint() - encRight.get());
-        return leftError < PID_COUNT_TOLERANCE.get() && rightError < PID_COUNT_TOLERANCE.get();
-        //return (pidLeftCount.onTarget() && pidRightCount.onTarget());
+        //double leftError = Math.abs(pidLeftCount.getSetpoint() - encLeft.get());
+        //double rightError = Math.abs(pidRightCount.getSetpoint() - encRight.get());
+        //return leftError < PID_COUNT_TOLERANCE.get() && rightError < PID_COUNT_TOLERANCE.get();
+        return (pidLeftCount.onTarget() && pidRightCount.onTarget());
     }
     
     public boolean reachedAngleSetpoint() {
@@ -252,6 +267,10 @@ public class ChassisSubsystem extends Subsystem {
     private void setSetpoint(double left, double right, boolean autoTrans) {
         double leftSetpoint;
         double rightSetpoint;
+
+        //Make sure pidLeft and pidRight are the only things using the wheels
+        disablePIDGyro();
+        disablePIDCount();
         
         if(USE_AUTO_TRANS && autoTrans) {
             //Right rate - left rate because left rate is negative

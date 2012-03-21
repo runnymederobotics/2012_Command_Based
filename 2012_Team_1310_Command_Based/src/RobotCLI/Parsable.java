@@ -67,16 +67,16 @@ public interface Parsable {
     	}
     	
 
-		public void parseFrom(String value) {
-			this.value = value;
-		}
-		
-		public String get() {
-			return value;
-		}
+        public void parseFrom(String value) {
+                this.value = value;
+        }
 
-		public void set(String value) {
-			this.value = value;
-		}
+        public String get() {
+                return value;
+        }
+
+        public void set(String value) {
+                this.value = value;
+        }
     }
 }

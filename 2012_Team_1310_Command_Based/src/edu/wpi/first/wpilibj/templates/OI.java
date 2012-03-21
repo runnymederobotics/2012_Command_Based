@@ -12,14 +12,15 @@ public class OI {
     final int DRIVER_TOGGLE_AUTO_BALANCE = 2;
     final int DRIVER_LOW_GEAR_BUTTON = 7;
     final int DRIVER_HIGH_GEAR_BUTTON = 8;
-    final int DRIVER_TOGGLE_BRIDGE_TIPPER = 6;
+    final int DRIVER_BRIDGE_TIPPER_BUTTON = 6;
+    final int DRIVER_BRIDGE_TIPPER_OVERRIDE_BUTTON = 4;
     
     final int OPERATOR_BALL_RELEASE = 1;
     final int OPERATOR_FORCE_SHOT = 2;
     
     final int OPERATOR_TOGGLE_MANUAL_SHOOTER = 4;
     
-    final int OPERATOR_TOGGLE_MANUAL_ELEVATOR = 10;
+    final int OPERATOR_TOGGLE_DISABLE_ELEVATOR = 10;
     final int OPERATOR_REVERSE_ELEVATOR_BUTTON = 12;
     
     final int OPERATOR_TOGGLE_MANUAL_TURRET = 9;
@@ -35,10 +36,9 @@ public class OI {
     Toggle autoBalanceToggle = new Toggle(false);
     
     Toggle manualShooterToggle = new Toggle(false);
-    Toggle enableElevatorToggle = new Toggle(true);
+    Toggle disableElevatorToggle = new Toggle(false);
     Toggle manualTurretToggle = new Toggle(false);
     
-
     /*        DRIVER        */
     
     final double AXIS_DEAD_ZONE = 0.25;
@@ -70,8 +70,12 @@ public class OI {
         return autoBalanceToggle.get();
     }
     
-    public boolean getBridgeTipperToggle() {
-        return stickDriver.getRawButton(DRIVER_TOGGLE_BRIDGE_TIPPER);
+    public boolean getBridgeTipperButton() {
+        return stickDriver.getRawButton(DRIVER_BRIDGE_TIPPER_BUTTON);
+    }
+    
+    public boolean getBridgeTipperOverride() {
+        return stickDriver.getRawButton(DRIVER_BRIDGE_TIPPER_OVERRIDE_BUTTON);
     }
     
     /*        OPERATOR        */
@@ -88,8 +92,8 @@ public class OI {
     }
 
     public boolean getEnableElevatorToggle() {
-        enableElevatorToggle.feed(stickOperator.getRawButton(OPERATOR_TOGGLE_MANUAL_ELEVATOR));
-        return enableElevatorToggle.get();
+        disableElevatorToggle.feed(stickOperator.getRawButton(OPERATOR_TOGGLE_DISABLE_ELEVATOR));
+        return disableElevatorToggle.get();
     }
     
     public boolean getReverseElevator() {

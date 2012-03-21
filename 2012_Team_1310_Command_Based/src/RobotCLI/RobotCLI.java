@@ -151,6 +151,8 @@ public class RobotCLI extends Thread {
 
         StreamConnection clientSocket;
 
+        boolean headlessMode = false;
+        
         ClientHandler(StreamConnection clientSocket) {
             this.clientSocket = clientSocket;
         }
@@ -178,9 +180,8 @@ public class RobotCLI extends Thread {
                 InputStreamReader in = new InputStreamReader(clientSocket.openInputStream());
                 PrintWriter out = new PrintWriter(clientSocket.openOutputStream());
 
-                out.println("Hello! You are connected to '" + robotName + "'");
-                out.println("Type 'help' for help.");
-                out.print("> ");
+                System.out.println("Client connected");
+                out.println("Hello! You are connected to '" + robotName + "'\nType 'help' for help.\n> ");
                 out.flush();
                 String request = null;
                 int c;
@@ -197,15 +198,11 @@ public class RobotCLI extends Thread {
                         System.out.println("Got request: " + request);
                         String[] commandAndArgs = split(request);
                         String command = commandAndArgs[0].trim();
-                        out.print(">> ");
+                        if(!headlessMode) {
+                            out.print(">> ");
+                        }
                         if ("help".equals(command)) {
-                            out.println("Command List:");
-                            out.println("set [variable] = [value]");
-                            out.println("print [variable]");
-                            out.println("watch [interval (ms)] [variable]");
-                            out.println("list");
-                            out.println("quit");
-                            out.println("exit");
+                            out.println("Command List:\r\nset [variable] = [value]\r\nprint [variable]\r\nwatch [interval (ms)] [variable]\r\nlist\r\nquit\r\nexit");
                         } else if ("set".equals(command)) {
                             doSetCommand(commandAndArgs, out);
                         } else if ("print".equals(command)) {
@@ -215,17 +212,24 @@ public class RobotCLI extends Thread {
                         } else if ("quit".equals(command) || "exit".equals(command)) {
                             clientSocket.close();
                             return;
+                        } else if ("headless".equals(command)) {
+                            headlessMode = true;
                         } else if ("watch".equals(command)) {
                             doWatchCommand(commandAndArgs, out, null);
                         } else {
                             out.println("Unknown command");
                         }
 
-                        out.print("\r\n> ");
+                        if(!headlessMode) {
+                            out.print("\r\n> ");
+                        } else {
+                            out.print("\n");
+                        }
                         out.flush();
                     }
                     request = new String();
                 }
+                System.out.println("Client disconnected");
             } catch (IOException e) {
                 System.out.println("Client error: " + e.toString());
             }
@@ -272,12 +276,20 @@ public class RobotCLI extends Thread {
                 out.println("Invalid 'list' command");
                 return;
             }*/
-            out.println("All variables: ");
+            String variableList = "";
+            //variableList += "All variables:\n";
             Enumeration keys = variables.variables.keys();
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
-                out.println(key + " = " + ((Parsable) variables.variables.get(key)).toString());
+                //Parsable parsable = (Parsable) variables.variables.get(key);
+                Object obj = variables.variables.get(key);
+                boolean isVariableContainer = obj.getClass().getName().equals(VariableContainer.class.getName());
+                if(!isVariableContainer) {
+                    variableList += key + (!headlessMode ? "\r" : "") + "\n";// + " = " + parsable.toString() + "\n";
+                }
             }
+            System.out.println(variableList);
+            out.println(variableList);
         }
 
         private void doPrintCommand(String[] commandAndArgs, PrintWriter out) throws IOException {

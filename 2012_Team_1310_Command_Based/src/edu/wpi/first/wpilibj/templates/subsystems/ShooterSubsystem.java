@@ -29,8 +29,8 @@ public class ShooterSubsystem extends Subsystem {
     public ShooterSubsystem(RobotCLI robotCLI) {
         VariableContainer vc = robotCLI.getVariables().createContainer("shooterSubsystem");
         
-        MAX_SHOOTER_ENCODER_RATE = vc.createInteger("maxShooterEncoderRate", 4000);
-        READY_TO_SHOOT_TOLERANCE = vc.createDouble("readyToShootTolerance", 150);
+        MAX_SHOOTER_ENCODER_RATE = vc.createInteger("maxShooterEncoderRate", 2800);
+        READY_TO_SHOOT_TOLERANCE = vc.createDouble("readyToShootTolerance", 400); //Changed from 150
         pidShooter = new ParsablePIDController("pidShooter", robotCLI.getVariables(), 0.002, 0.0, 0.0, 0.0, 1.0, 50);
         
         Arrays.sort(setpointLookupTable, new Comparer() {
@@ -97,7 +97,7 @@ public class ShooterSubsystem extends Subsystem {
 
         while(start <= end) {
             int i = (start + end ) / 2;
-            if(i >= setpointLookupTable.length)
+            if(i >= setpointLookupTable.length - 1)
                 break;
             ExperimentalMeasurement current = setpointLookupTable[i];
             ExperimentalMeasurement next = setpointLookupTable[i + 1];
@@ -118,15 +118,16 @@ public class ShooterSubsystem extends Subsystem {
     
     public boolean onTarget() {
         return Math.abs(encShooter.getRate() - pidShooter.getSetpoint()) < READY_TO_SHOOT_TOLERANCE.get();
+        //return pidShooter.onTarget();
     }
     
-    public boolean getShooterRunningAndOnTarget() {
-        return shooterMotor.get() != 0.0 && onTarget();
+    public boolean getShooterRunning() {
+        return shooterMotor.get() != 0.0;// && onTarget();
     }
     
-    public void setSetpoint(double rate) {
+    public void setSetpoint(double setpoint) {
         pidShooter.setInput(encShooter.getRate());
-        pidShooter.setSetpoint(rate * MAX_SHOOTER_ENCODER_RATE.get());
+        pidShooter.setSetpoint(setpoint);
         pidShooter.process();
         shooterMotor.set(pidShooter.getOutput());
     }

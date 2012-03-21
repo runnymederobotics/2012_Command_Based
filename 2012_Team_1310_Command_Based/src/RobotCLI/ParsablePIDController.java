@@ -68,6 +68,10 @@ public class ParsablePIDController extends VariableContainer {
     public double getOutput() {
         return output.get();
     }
+    
+    public double getError() {
+        return error.get();
+    }
 
     public void setOutputRange(double minOut, double maxOut) {
         this.minOut.set(minOut);
@@ -128,7 +132,22 @@ public class ParsablePIDController extends VariableContainer {
     }
 
     public String toString() {
-        return "{p: " + p + " i: " + i + " d: " + d + " setpoint: " + setpoint + " input: " + input
-                + " error: " + error + " outputP: " + outputP + " outputI: " + outputI + " outputD: "+ outputD + " output: " + output + " onTarget: " + onTarget()+ "}";
+        String ret = "";
+        String containerName = this.name + ".";
+        ret += containerName + "p = " + p + "\n";
+        ret += containerName + "i = " + i + "\n";
+        ret += containerName + "d = " + d + "\n";
+        ret += containerName + "setpoint = " + setpoint + "\n";
+        ret += containerName + "input = " + input + "\n";
+        ret += containerName + "error = " + error + "\n";
+        ret += containerName + "outputP = " + outputP + "\n";
+        ret += containerName + "outputI = " + outputI + "\n";
+        ret += containerName + "outputD = " + outputD + "\n";
+        ret += containerName + "output = " + output + "\n";
+        ret += containerName + "onTarget = " + onTarget() + "\n";
+        
+        return ret;
+        //return "{p: " + p + " i: " + i + " d: " + d + " setpoint: " + setpoint + " input: " + input
+        //        + " error: " + error + " outputP: " + outputP + " outputI: " + outputI + " outputD: "+ outputD + " output: " + output + " onTarget: " + onTarget()+ "}";
     }
 }

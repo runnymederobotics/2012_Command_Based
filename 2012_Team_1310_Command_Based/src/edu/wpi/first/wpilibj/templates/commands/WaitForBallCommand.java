@@ -1,9 +1,10 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
-public class BridgeTipDownCommand extends CommandBase {
-    public BridgeTipDownCommand() {
+public class WaitForBallCommand extends CommandBase {
+    
+    public WaitForBallCommand() {
         // Use requires() here to declare subsystem dependencies
-        requires(bridgeTipSubsystem);
+        requires(elevatorSubsystem);
     }
 
     // Called just before this Command runs the first time
@@ -12,14 +13,13 @@ public class BridgeTipDownCommand extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        boolean override = false;
-        boolean request = true;
-        bridgeTipSubsystem.set(override, request);
+        //Continuously run the elevator
+        elevatorSubsystem.runElevator(false, false, false);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return bridgeTipSubsystem.get();
+        return elevatorSubsystem.hasBalls();
     }
 
     // Called once after isFinished returns true

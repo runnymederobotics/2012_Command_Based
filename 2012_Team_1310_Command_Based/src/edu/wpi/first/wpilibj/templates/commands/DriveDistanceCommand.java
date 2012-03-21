@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.templates.RobotTemplate;
 
@@ -45,7 +46,12 @@ public class DriveDistanceCommand extends CommandBase {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return chassisSubsystem.reachedCountSetpoint();
+        double inclineAngle = Math.abs(chassisSubsystem.getYZAngle());
+        //If our gyro says we are on an incline then we need to stop
+        //TODO: Make this logic work
+        boolean onBridge = inclineAngle > AutoBalanceCommand.HORIZONTAL_TOLERANCE && inclineAngle < AutoBalanceCommand.INCLINE;
+        //End the command when we've reached our setpoint or if we are in teleop mode
+        return chassisSubsystem.reachedCountSetpoint() || DriverStation.getInstance().isOperatorControl() || onBridge;
     }
 
     // Called once after isFinished returns true

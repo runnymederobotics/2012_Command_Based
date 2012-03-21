@@ -1,7 +1,5 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
-import edu.wpi.first.wpilibj.DriverStation;
-
 public class ElevatorCommand extends CommandBase {
     
     public ElevatorCommand() {
@@ -16,9 +14,9 @@ public class ElevatorCommand extends CommandBase {
     boolean releasingBall = false;
     
     // Called repeatedly when this Command is scheduled to run
-    protected void execute() {
-        elevatorSubsystem.runRoller(oi.getEnableElevatorToggle(), oi.getBallRelease(), oi.getReverseElevator());
-        elevatorSubsystem.handleBallRelease(oi.getBallRelease(), oi.getForceShot(), shooterSubsystem.getShooterRunningAndOnTarget());
+    protected void execute() {        
+        elevatorSubsystem.runElevator(oi.getEnableElevatorToggle(), oi.getBallRelease(), oi.getReverseElevator());
+        elevatorSubsystem.handleBallRelease(oi.getBallRelease(), oi.getForceShot(), shooterSubsystem.getShooterRunning(), shooterSubsystem.onTarget(), turretSubsystem.onTarget());
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.templates.Pneumatic;
 import edu.wpi.first.wpilibj.templates.RobotMap;
 import edu.wpi.first.wpilibj.templates.commands.ElevatorCommand;
@@ -22,6 +23,8 @@ public class ElevatorSubsystem extends Subsystem {
     ParsableDouble ELEVATOR_SPEED;
     ParsableDouble RELEASE_DELAY;
     ParsableDouble RECOVER_TIME; //Time for shooter to recover after a shot
+    public ParsableDouble AUTONOMOUS_SHOOT_DELAY;
+    public ParsableDouble AUTONOMOUS_SHOOT_TIMEOUT;
     
     Jaguar elevatorMotor = new Jaguar(RobotMap.ELEVATOR_MOTOR);
     
@@ -31,12 +34,16 @@ public class ElevatorSubsystem extends Subsystem {
     
     Pneumatic ballRelease = new Pneumatic(new DoubleSolenoid(RobotMap.ELEVATOR_BALL_RELEASE_ONE, RobotMap.ELEVATOR_BALL_RELEASE_TWO));
     
+    NetworkTable ballCounter = NetworkTable.getTable("1310BallCounter");
+    
     public ElevatorSubsystem(RobotCLI robotCLI) {
         VariableContainer vc = robotCLI.getVariables().createContainer("elevatorSubsystem");
         
         ELEVATOR_SPEED = vc.createDouble("elevatorSpeed", 0.5);
         RELEASE_DELAY = vc.createDouble("releaseDelay", 0.35);
         RECOVER_TIME = vc.createDouble("recoverTime", 0.75);
+        AUTONOMOUS_SHOOT_DELAY = vc.createDouble("autonomousShootDelay", 2.0);
+        AUTONOMOUS_SHOOT_TIMEOUT = vc.createDouble("autonomousShootTimeout", 2.0);
     }
     
     public void disable() {
@@ -49,6 +56,27 @@ public class ElevatorSubsystem extends Subsystem {
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         setDefaultCommand(new ElevatorCommand());
+    }
+    
+    public void updateDashboard() {
+        //Update our ball counter on the dashboard
+        ballCounter.beginTransaction();
+        ballCounter.putBoolean("BottomBall", !bottomBall.get());
+        ballCounter.putBoolean("MiddleBall", !middleBall.get());
+        ballCounter.putBoolean("TopBall", !topBall.get());
+        ballCounter.endTransaction();
+    }
+    
+    public boolean getBottomBall() {
+        return !bottomBall.get();
+    }
+    
+    public boolean getMiddleBall() {
+        return !middleBall.get();
+    }
+    
+    public boolean getTopBall() {
+        return !topBall.get();
     }
     
     public boolean hasMaxBalls() {
@@ -67,13 +95,15 @@ public class ElevatorSubsystem extends Subsystem {
     double releaseTime = 0.0;
     double retractTime = 0.0;
     
-    public void handleBallRelease(boolean shootRequest, boolean forceShot, boolean shooterRunningAndOnTarget) {
+    public void handleBallRelease(boolean shootRequest, boolean forceShot, boolean shooterRunning, boolean shooterOnTarget, boolean turretOnTarget) {
+        updateDashboard();
+        
         double now = Timer.getFPGATimestamp();
         
         //TODO: add condition for topBall being true?
-        boolean readyToShoot = elevatorRunning() && shooterRunningAndOnTarget;
+        boolean allowShot = elevatorRunning() && shooterOnTarget /* && turretOnTarget */&& getTopBall();
 
-        if(now - retractTime > RECOVER_TIME.get() && shootRequest && (readyToShoot || forceShot)) {
+        if(now - retractTime > RECOVER_TIME.get() && shootRequest && shooterRunning && (allowShot || forceShot)) {
             if(!releasingBall) { //If we werent previously releasing
                 releaseTime = now;
                 ballRelease.set(RELEASE_VALUE);
@@ -91,7 +121,7 @@ public class ElevatorSubsystem extends Subsystem {
         }
     }
     
-    public void runRoller(boolean disableRequest, boolean shootRequest, boolean reverseRequest) {
+    public void runElevator(boolean disableRequest, boolean shootRequest, boolean reverseRequest) {
         boolean shooting = shootRequest || releasingBall;
         
         if(reverseRequest) {

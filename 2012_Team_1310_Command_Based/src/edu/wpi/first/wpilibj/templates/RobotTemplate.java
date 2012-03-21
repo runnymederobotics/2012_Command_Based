@@ -55,7 +55,8 @@ public class RobotTemplate extends IterativeRobot {
 
         compressor.start();
         
-        autonomousChooser.addDefault("Nothing", DriveDistanceCommand.creator(0));
+        autonomousChooser.addDefault("Nothing", DoNothingCommandGroup.creator());
+        autonomousChooser.addObject("Continuous-Shoot", ContinuousShootCommandGroup.creator());
         autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip", ShootTipCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip-Then-Shoot", ShootTipShootCommandGroup.creator());
@@ -83,12 +84,13 @@ public class RobotTemplate extends IterativeRobot {
     }
     //Called when autonomous mode is entered
     public void autonomousInit() {
-        enableSubsystems();
-        
         CommandCreator creator = (CommandCreator)autonomousChooser.getSelected();
         autonomousCommand = creator.create();
-        System.out.println("autonomousInit starting " + autonomousCommand);
-        autonomousCommand.start();
+        if(!autonomousCommand.getName().equals("DoNothingCommandGroup")) {
+            enableSubsystems();
+            System.out.println("autonomousInit starting " + autonomousCommand);
+            autonomousCommand.start();
+        }
     }
     //Called when teleop mode is entered
     public void teleopInit() {
@@ -101,6 +103,7 @@ public class RobotTemplate extends IterativeRobot {
 
     //This function is called periodically when disabled
     public void disabledPeriodic() {
+        //print("Disabled");
     }
     //This function is called periodically during autonomous
     public void autonomousPeriodic() {
@@ -131,7 +134,10 @@ public class RobotTemplate extends IterativeRobot {
             CommandBase.shooterSubsystem.print();
             System.out.print("\n");
             CommandBase.turretSubsystem.print();
-            TurretCommand.print();;
+            System.out.print("\n");
+            CommandBase.bridgeTipSubsystem.print();
+            System.out.print("\n");
+            TurretCommand.print();
             System.out.print("\n");
             CommandBase.oi.print();
             System.out.print("\n");
