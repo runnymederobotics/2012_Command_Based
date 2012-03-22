@@ -64,7 +64,7 @@ public class ChassisSubsystem extends Subsystem {
     ParsablePIDController pidLeftCount;// = new SendablePIDController(PID_COUNT_P, PID_COUNT_I, PID_COUNT_D, encLeftCount, pidLeftCountStorage);
     ParsablePIDController pidRightCount;// = new SendablePIDController(PID_COUNT_P, PID_COUNT_I, PID_COUNT_D, encRightCount, pidRightCountStorage);
     
-    Pneumatic transShift = new Pneumatic(new DoubleSolenoid(1, 2));
+    Pneumatic transShift = new Pneumatic(new DoubleSolenoid(RobotMap.TRANS_SHIFT_FORWARD, RobotMap.TRANS_SHIFT_REVERSE));
     
     boolean usePID = true;
     boolean usePIDCount = false;

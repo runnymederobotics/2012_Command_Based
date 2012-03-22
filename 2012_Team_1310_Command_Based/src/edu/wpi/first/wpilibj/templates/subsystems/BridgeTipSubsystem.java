@@ -17,11 +17,11 @@ public class BridgeTipSubsystem extends Subsystem {
 
     ParsableDouble LOCK_DELAY;
     
-    ParsableDouble LOCK_RIGHT_IN;
-    ParsableDouble LOCK_RIGHT_OUT;
+    ParsableDouble LOCK_RIGHT;
+    ParsableDouble UNLOCK_RIGHT;
     
-    ParsableDouble LOCK_LEFT_IN;
-    ParsableDouble LOCK_LEFT_OUT;
+    ParsableDouble LOCK_LEFT;
+    ParsableDouble UNLOCK_LEFT;
     
     Pneumatic bridgeTipperPneumatic = new Pneumatic(new DoubleSolenoid(RobotMap.BRIDGE_TIPPER_ONE, RobotMap.BRIDGE_TIPPER_TWO));
     
@@ -35,10 +35,10 @@ public class BridgeTipSubsystem extends Subsystem {
         VariableContainer vc = robotCLI.getVariables().createContainer("bridgeTipSubsystem");
         LOCK_DELAY = vc.createDouble("lockDelay", 1.0);
         
-        LOCK_RIGHT_IN = vc.createDouble("lockRightIn", 0.9);
-        LOCK_RIGHT_OUT = vc.createDouble("lockRightOut", 0.57);
-        LOCK_LEFT_IN = vc.createDouble("lockLeftIn", 0.3);
-        LOCK_LEFT_OUT = vc.createDouble("lockLeftOut", 0.75);
+        LOCK_RIGHT = vc.createDouble("lockRight", 1.0);
+        UNLOCK_RIGHT = vc.createDouble("unlockRight", 0.635);
+        LOCK_LEFT = vc.createDouble("lockLeft", 0.0);
+        UNLOCK_LEFT = vc.createDouble("unlockLeft", 0.34);
     }
     
     public void initDefaultCommand() {
@@ -60,8 +60,8 @@ public class BridgeTipSubsystem extends Subsystem {
                     lastSetTime = now;
                 }
             } else if(actualValue && !requestValue) {
-                rightLockPosition = LOCK_RIGHT_OUT.get(); //We are down and we want to go up
-                leftLockPosition = LOCK_LEFT_OUT.get();
+                rightLockPosition = UNLOCK_RIGHT.get(); //We are down and we want to go up
+                leftLockPosition = UNLOCK_LEFT.get();
                 if(lastSetTime == 0) {
                     lastSetTime = now;
                 }
@@ -70,8 +70,8 @@ public class BridgeTipSubsystem extends Subsystem {
             if(lastSetTime != 0 && now - lastSetTime > LOCK_DELAY.get()) {
                 lastSetTime = 0; //Reset lastSetTime
                 if(actualValue && requestValue) {
-                    rightLockPosition = LOCK_RIGHT_IN.get(); //We went down so lock in
-                    leftLockPosition = LOCK_LEFT_IN.get();
+                    rightLockPosition = LOCK_RIGHT.get(); //We went down so lock in
+                    leftLockPosition = LOCK_LEFT.get();
                 } else {
                     bridgeTipperPneumatic.set(false); //We wanted to go up
                 }

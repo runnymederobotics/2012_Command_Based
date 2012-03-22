@@ -34,7 +34,7 @@ public class OI {
     public Joystick stickDriver = new Joystick(1);
     public Joystick stickOperator = new Joystick(2);
 
-    Toggle pidToggle = new Toggle(true);
+    Toggle pidToggle = new Toggle(false);
     Toggle autoBalanceToggle = new Toggle(false);
     
     Toggle manualShooterToggle = new Toggle(false);
