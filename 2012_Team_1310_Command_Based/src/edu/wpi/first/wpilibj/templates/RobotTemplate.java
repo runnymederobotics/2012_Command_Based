@@ -127,20 +127,20 @@ public class RobotTemplate extends IterativeRobot {
             //System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
             System.out.print("[" + mode + "]\n");
             
-            CommandBase.chassisSubsystem.print();
-            System.out.print("\n");
-            CommandBase.elevatorSubsystem.print();
-            System.out.print("\n");
-            CommandBase.shooterSubsystem.print();
-            System.out.print("\n");
+            //CommandBase.chassisSubsystem.print();
+            //System.out.print("\n");
+            //CommandBase.elevatorSubsystem.print();
+            //System.out.print("\n");
+            //CommandBase.shooterSubsystem.print();
+            //System.out.print("\n");
             CommandBase.turretSubsystem.print();
             System.out.print("\n");
-            CommandBase.bridgeTipSubsystem.print();
+            //CommandBase.bridgeTipSubsystem.print();
             System.out.print("\n");
             TurretCommand.print();
             System.out.print("\n");
-            CommandBase.oi.print();
-            System.out.print("\n");
+            //CommandBase.oi.print();
+            //System.out.print("\n");
             
             System.out.flush();
         }

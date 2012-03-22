@@ -52,6 +52,8 @@ public class OI {
     
     public double getRotationAxis() {
         double axis = stickDriver.getRawAxis(DRIVER_ROTATION_AXIS);
+        int sign = axis < 0 ? -1 : 1;
+        axis *= axis * sign;
         return Math.abs(axis) >= AXIS_DEAD_ZONE ? axis : 0.0;
     }
     

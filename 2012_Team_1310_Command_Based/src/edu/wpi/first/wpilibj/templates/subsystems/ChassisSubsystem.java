@@ -306,6 +306,9 @@ public class ChassisSubsystem extends Subsystem {
             motorLeft.set(pidLeft.getOutput());
             motorRight.set(pidRight.getOutput());
         } else {
+            pidLeft.reset();
+            pidRight.reset();
+            
             motorLeft.set(left);
             motorRight.set(right);
         }

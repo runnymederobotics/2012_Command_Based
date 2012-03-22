@@ -49,7 +49,7 @@ public class TurretSubsystem extends Subsystem {
         NEW_SETPOINT_TOLERANCE = vc.createDouble("newSetpointTolerance", 18.36);
         MANUAL_MODE_SPEED = vc.createDouble("manualModeSpeed", 0.5);
         
-        pidTurret = new ParsablePIDController("pidTurret", robotCLI.getVariables(), 0.005, 0.00001, 0.0, -0.5, 0.5, 8.75);
+        pidTurret = new ParsablePIDController("pidTurret", robotCLI.getVariables(), 0.0075, 0.00001, 0.0, -0.5, 0.5, 8.75);
         
         encTurret.start();
         encTurret.setPIDSourceParameter(Encoder.PIDSourceParameter.kDistance);
