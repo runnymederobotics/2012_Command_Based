@@ -17,7 +17,7 @@ public class ShootTipCommandGroup extends CommandGroup {
     }
     
     public ShootTipCommandGroup() {
-        addSequential(new AutonomousShootCommand(false)); //Shoot all our balls
+        addSequential(new AutonomousShootCommand(false, true)); //Shoot all our balls
         addSequential(new BridgeTipDownCommand()); //Lower the bridge tipper
         addSequential(new DriveDistanceCommand(1000)); //Drive towards the bridge (a condition for this stopping is if the YZ gyro has a reading)
     }

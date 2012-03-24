@@ -41,6 +41,18 @@ public class BridgeTipSubsystem extends Subsystem {
         UNLOCK_LEFT = vc.createDouble("unlockLeft", 0.34);
     }
     
+    public void disable() {
+        
+    }
+    
+    public void enable() {
+        rightLock.set(UNLOCK_RIGHT.get());
+        leftLock.set(UNLOCK_LEFT.get());
+        
+        rightLockPosition = UNLOCK_RIGHT.get();
+        leftLockPosition = UNLOCK_LEFT.get();
+    }
+    
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         setDefaultCommand(new ManualBridgeTipCommand());

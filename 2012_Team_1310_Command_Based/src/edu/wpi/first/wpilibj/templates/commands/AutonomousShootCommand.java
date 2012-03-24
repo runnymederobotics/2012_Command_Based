@@ -15,12 +15,14 @@ public class AutonomousShootCommand extends CommandBase {
     double lastBallTime = 0;
     
     boolean neverStop = true;
+    boolean trackTarget = true;
     
-    public AutonomousShootCommand(boolean neverStop) {
+    public AutonomousShootCommand(boolean neverStop, boolean trackTarget) {
         // Use requires() here to declare subsystem dependencies
         requires(elevatorSubsystem);
         
         this.neverStop = neverStop;
+        this.trackTarget = trackTarget;
     }
 
     // Called just before this Command runs the first time
@@ -37,19 +39,28 @@ public class AutonomousShootCommand extends CommandBase {
         
         CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
         
-        boolean shootRequest = Math.abs(targetAngle[0]) < CAMERA_TOLERANCE;
+        boolean shootRequest = true;
+        if(trackTarget) {
+            shootRequest = targetAngle[0] < CAMERA_TOLERANCE + turretSubsystem.CAMERA_ERROR.get() && targetAngle[0] > turretSubsystem.CAMERA_ERROR.get() - CAMERA_TOLERANCE;
+        }
         boolean disableRequest = false;
         boolean forceShot = false;
         boolean reverseRequest = false;
         boolean shooterRunning = false;
         boolean shooterOnTarget = false;
         boolean turretOnTarget = false;
+        
         if(now - lastShotTime > elevatorSubsystem.AUTONOMOUS_SHOOT_DELAY.get()) {
             shooterRunning = shooterSubsystem.getShooterRunning();
             shooterOnTarget = shooterSubsystem.onTarget();
-            turretOnTarget = turretSubsystem.onTarget();
+            if(trackTarget) {
+                turretOnTarget = turretSubsystem.onTarget();
+            } else {
+                turretOnTarget = true;
+            }
             if(shooterRunning && turretOnTarget) {
                 lastShotTime = now;
+                forceShot = true;
                 System.out.println("ReadyToShoot, restarting lastShootTime");
             }
         }

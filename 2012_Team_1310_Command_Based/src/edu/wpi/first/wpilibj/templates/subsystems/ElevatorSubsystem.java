@@ -44,7 +44,7 @@ public class ElevatorSubsystem extends Subsystem {
         VariableContainer vc = robotCLI.getVariables().createContainer("elevatorSubsystem");
         
         ELEVATOR_SPEED = vc.createDouble("elevatorSpeed", 0.75);
-        RELEASE_DELAY = vc.createDouble("releaseDelay", 0.5);
+        RELEASE_DELAY = vc.createDouble("releaseDelay", 0.35);
         RECOVER_TIME = vc.createDouble("recoverTime", 0.75);
         AUTONOMOUS_SHOOT_DELAY = vc.createDouble("autonomousShootDelay", 2.0);
         AUTONOMOUS_SHOOT_TIMEOUT = vc.createDouble("autonomousShootTimeout", 2.0);

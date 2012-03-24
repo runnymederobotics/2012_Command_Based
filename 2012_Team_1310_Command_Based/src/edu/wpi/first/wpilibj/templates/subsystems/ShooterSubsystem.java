@@ -75,15 +75,32 @@ public class ShooterSubsystem extends Subsystem {
     }
 
     ExperimentalMeasurement[] setpointLookupTable = {
+        
         new ExperimentalMeasurement(0.0, 0.0),
-        new ExperimentalMeasurement(80, 2450),
-        new ExperimentalMeasurement(88, 2300),
-        new ExperimentalMeasurement(92, 2300),
-        new ExperimentalMeasurement(105, 2300),
-        new ExperimentalMeasurement(113, 2453),
-        new ExperimentalMeasurement(130, 2500),
-        new ExperimentalMeasurement(152, 2730),
-        new ExperimentalMeasurement(210, 3300), //Full speed
+        
+        //NEW VALUES MIXED WITH OLD ONES
+        /*new ExperimentalMeasurement(80, 2400),
+        new ExperimentalMeasurement(87, 2300),
+        new ExperimentalMeasurement(95, 2350),
+        new ExperimentalMeasurement(105, 2400),
+        new ExperimentalMeasurement(115, 2550),
+        new ExperimentalMeasurement(130, 2700),
+        new ExperimentalMeasurement(138, 2800),
+        */
+        //OLD VALUES
+        /*new ExperimentalMeasurement(80, 2450 * 1.15),
+        new ExperimentalMeasurement(88, 2300 * 1.15),
+        new ExperimentalMeasurement(92, 2300 * 1.1),
+        new ExperimentalMeasurement(105, 2300 * 1.05),
+        new ExperimentalMeasurement(113, 2453 * 1.05),
+        new ExperimentalMeasurement(130, 2500 * 1.05),
+        new ExperimentalMeasurement(152, 2730 * 1.05),
+        new ExperimentalMeasurement(210, 3300 * 1.05), //Full speed  */
+        
+        new ExperimentalMeasurement(95, 2435),
+        new ExperimentalMeasurement(105, 2570),
+        new ExperimentalMeasurement(128, 2657),
+        
         new ExperimentalMeasurement(1000.0, 10000),
     };
     

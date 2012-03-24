@@ -17,6 +17,8 @@ public class ContinuousShootCommandGroup extends CommandGroup {
     }
     
     public ContinuousShootCommandGroup() {
-        addSequential(new AutonomousShootCommand(true));
+        final boolean neverStop = true;
+        final boolean trackTarget = true;
+        addSequential(new AutonomousShootCommand(neverStop, trackTarget));
     }
 }

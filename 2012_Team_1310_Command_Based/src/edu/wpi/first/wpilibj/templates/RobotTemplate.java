@@ -57,6 +57,7 @@ public class RobotTemplate extends IterativeRobot {
         
         autonomousChooser.addDefault("Nothing", DoNothingCommandGroup.creator());
         autonomousChooser.addObject("Continuous-Shoot", ContinuousShootCommandGroup.creator());
+        autonomousChooser.addObject("Continuous-Shoot-No-Track", ContinuousShootNoTrackCommandGroup.creator());
         autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip", ShootTipCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip-Then-Shoot", ShootTipShootCommandGroup.creator());
@@ -65,6 +66,7 @@ public class RobotTemplate extends IterativeRobot {
     }
     
     private void enableSubsystems() {
+        CommandBase.bridgeTipSubsystem.enable();
         CommandBase.chassisSubsystem.enable();
         CommandBase.elevatorSubsystem.enable();
         CommandBase.shooterSubsystem.enable();
@@ -72,6 +74,7 @@ public class RobotTemplate extends IterativeRobot {
     }
     
     private void disableSubsystems() {
+        CommandBase.bridgeTipSubsystem.disable();
         CommandBase.chassisSubsystem.disable();
         CommandBase.elevatorSubsystem.disable();
         CommandBase.shooterSubsystem.disable();

@@ -45,7 +45,7 @@ public class TurretSubsystem extends Subsystem {
         
         SEARCH_ANGLE = vc.createInteger("searchAngle", 10);
         COUNTS_PER_DEGREE = vc.createDouble("countsPerDegree", 9.18);
-        CAMERA_ERROR = vc.createDouble("cameraError", 2.5); //Was 2.5
+        CAMERA_ERROR = vc.createDouble("cameraError", 1.5); //Was 2.5
         NEW_SETPOINT_TOLERANCE = vc.createDouble("newSetpointTolerance", 18.36);
         MANUAL_MODE_SPEED = vc.createDouble("manualModeSpeed", 0.5);
         
@@ -57,7 +57,7 @@ public class TurretSubsystem extends Subsystem {
 
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        setDefaultCommand(new TurretCommand());
+        setDefaultCommand(new TurretCommand(true));
     }
     
     public void reset() {

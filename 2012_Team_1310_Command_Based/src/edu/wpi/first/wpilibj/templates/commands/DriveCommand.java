@@ -43,6 +43,8 @@ public class DriveCommand extends CommandBase {
             }
 
             chassisSubsystem.drive(oi.getSpeedAxis(), oi.getRotationAxis(), allowAutoShift);
+        } else {
+            chassisSubsystem.drive(0.0, 0.0, false);
         }
     }
 

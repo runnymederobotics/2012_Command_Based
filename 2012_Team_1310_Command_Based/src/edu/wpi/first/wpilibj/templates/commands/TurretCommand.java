@@ -9,8 +9,11 @@ public class TurretCommand extends CommandBase {
     
     static int[] readerSequenceNumber = new int[1];
     
-    public TurretCommand() {
+    boolean autonomousTrackTarget = true;
+    
+    public TurretCommand(boolean autonomousTrackTarget) {
         requires(turretSubsystem);
+        this.autonomousTrackTarget = autonomousTrackTarget;
     }
 
     // Called just before this Command runs the first time
@@ -22,12 +25,16 @@ public class TurretCommand extends CommandBase {
         boolean canSeeTarget = CameraSystem.getTargetAngle(readerSequenceNumber, targetAngle, freshSequence);
         double manualSetpoint = turretSubsystem.SEARCH_ANGLE.get() * oi.getManualTurretDirection();
         
-        if(DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle()) {
+        if(!autonomousTrackTarget || (DriverStation.getInstance().isOperatorControl() && oi.getManualTurretToggle())) {
             turretSubsystem.manualMode(manualSetpoint);
             //turretSubsystem.setRelativeAngleSetpoint(manualSetpoint);
             //turretSubsystem.execute();
-            turretSubsystem.setCameraLight(oi.getLightSwitch()); //Turn off camera in manual mode
-        } else {
+            if(autonomousTrackTarget) {
+                turretSubsystem.setCameraLight(oi.getLightSwitch()); //Turn off camera in manual mode
+            } else {
+                turretSubsystem.setCameraLight(true);
+            }
+        } else if(autonomousTrackTarget) {
             //turretSubsystem.enable();
             
             double relativeAngleSetpoint = -targetAngle[0] + turretSubsystem.CAMERA_ERROR.get();
