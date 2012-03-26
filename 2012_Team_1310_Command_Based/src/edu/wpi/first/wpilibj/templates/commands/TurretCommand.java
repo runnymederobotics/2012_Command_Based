@@ -47,7 +47,10 @@ public class TurretCommand extends CommandBase {
                 turretSubsystem.setRelativeAngleSetpoint(manualSetpoint);
             }
             turretSubsystem.setCameraLight(true); //Turn off camera in manual mode
-            turretSubsystem.execute();
+            if(elevatorSubsystem.allowTurret()) {
+                //Make the turret delay for a certain amount of time after a shot
+                turretSubsystem.execute();
+            }
         }
         
     }

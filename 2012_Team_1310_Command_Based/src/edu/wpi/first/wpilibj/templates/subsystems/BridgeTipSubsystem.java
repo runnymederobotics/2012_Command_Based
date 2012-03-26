@@ -36,7 +36,7 @@ public class BridgeTipSubsystem extends Subsystem {
         LOCK_DELAY = vc.createDouble("lockDelay", 1.0);
         
         LOCK_RIGHT = vc.createDouble("lockRight", 1.0);
-        UNLOCK_RIGHT = vc.createDouble("unlockRight", 0.635);
+        UNLOCK_RIGHT = vc.createDouble("unlockRight", 0.71);
         LOCK_LEFT = vc.createDouble("lockLeft", 0.0);
         UNLOCK_LEFT = vc.createDouble("unlockLeft", 0.34);
     }

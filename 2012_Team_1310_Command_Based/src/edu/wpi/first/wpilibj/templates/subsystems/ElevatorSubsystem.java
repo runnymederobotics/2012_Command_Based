@@ -23,6 +23,7 @@ public class ElevatorSubsystem extends Subsystem {
     ParsableDouble ELEVATOR_SPEED;
     ParsableDouble RELEASE_DELAY;
     ParsableDouble RECOVER_TIME; //Time for shooter to recover after a shot
+    ParsableDouble TURRET_DISABLE_TIME; //Time that turret is disabled after shot
     public ParsableDouble AUTONOMOUS_SHOOT_DELAY;
     public ParsableDouble AUTONOMOUS_SHOOT_TIMEOUT;
     
@@ -46,6 +47,7 @@ public class ElevatorSubsystem extends Subsystem {
         ELEVATOR_SPEED = vc.createDouble("elevatorSpeed", 0.75);
         RELEASE_DELAY = vc.createDouble("releaseDelay", 0.35);
         RECOVER_TIME = vc.createDouble("recoverTime", 0.75);
+        TURRET_DISABLE_TIME = vc.createDouble("", 3.0);
         AUTONOMOUS_SHOOT_DELAY = vc.createDouble("autonomousShootDelay", 2.0);
         AUTONOMOUS_SHOOT_TIMEOUT = vc.createDouble("autonomousShootTimeout", 2.0);
     }
@@ -99,6 +101,11 @@ public class ElevatorSubsystem extends Subsystem {
     
     public boolean elevatorRunning() {
         return elevatorMotor.get() != 0.0;
+    }
+    
+    public boolean allowTurret() {
+        double now = Timer.getFPGATimestamp();
+        return now - releaseTime > TURRET_DISABLE_TIME.get();
     }
     
     boolean releasingBall = false;

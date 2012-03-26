@@ -100,6 +100,8 @@ public class ShooterSubsystem extends Subsystem {
         new ExperimentalMeasurement(95, 2435),
         new ExperimentalMeasurement(105, 2570),
         new ExperimentalMeasurement(128, 2657),
+        new ExperimentalMeasurement(130, 2800), 
+        new ExperimentalMeasurement(140, 2800),
         
         new ExperimentalMeasurement(1000.0, 10000),
     };
