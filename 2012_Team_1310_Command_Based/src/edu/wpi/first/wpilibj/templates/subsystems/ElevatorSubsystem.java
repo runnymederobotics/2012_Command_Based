@@ -48,7 +48,7 @@ public class ElevatorSubsystem extends Subsystem {
         RELEASE_DELAY = vc.createDouble("releaseDelay", 0.35);
         RECOVER_TIME = vc.createDouble("recoverTime", 0.75);
         TURRET_DISABLE_TIME = vc.createDouble("", 3.0);
-        AUTONOMOUS_SHOOT_DELAY = vc.createDouble("autonomousShootDelay", 2.0);
+        AUTONOMOUS_SHOOT_DELAY = vc.createDouble("autonomousShootDelay", 1.0);
         AUTONOMOUS_SHOOT_TIMEOUT = vc.createDouble("autonomousShootTimeout", 2.0);
     }
     

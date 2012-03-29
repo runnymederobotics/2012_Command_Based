@@ -50,15 +50,15 @@ public class AutonomousShootCommand extends CommandBase {
         boolean shooterOnTarget = false;
         boolean turretOnTarget = false;
         
-        if(now - lastShotTime > elevatorSubsystem.AUTONOMOUS_SHOOT_DELAY.get()) {
-            shooterRunning = shooterSubsystem.getShooterRunning();
-            shooterOnTarget = shooterSubsystem.onTarget();
-            if(trackTarget) {
-                turretOnTarget = turretSubsystem.onTarget();
-            } else {
-                turretOnTarget = true;
-            }
-            if(shooterRunning && turretOnTarget) {
+        shooterRunning = shooterSubsystem.getShooterRunning();
+        shooterOnTarget = shooterSubsystem.onTarget();
+        if(trackTarget) {
+            turretOnTarget = turretSubsystem.onTarget();
+        } else {
+            turretOnTarget = true;
+        }
+        if(shooterRunning && turretOnTarget) {
+            if(now - lastShotTime > elevatorSubsystem.AUTONOMOUS_SHOOT_DELAY.get()) {
                 lastShotTime = now;
                 forceShot = true;
                 System.out.println("ReadyToShoot, restarting lastShootTime");

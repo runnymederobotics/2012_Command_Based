@@ -22,7 +22,7 @@ public class AlleyOopCommandGroup extends CommandGroup {
         //Constantly track the target
         //Constantly run the elevator
         
-        addSequential(new DriveDistanceCommand(1000));
+        addSequential(new DriveDistanceCommand(-400));
         addSequential(new AutonomousShootCommand(false, true));
         //addSequential(new DriveDistanceCommand(-1000));
     }

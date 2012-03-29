@@ -1,9 +1,15 @@
 package edu.wpi.first.wpilibj.templates.commands;
 
-public class BridgeTipDownCommand extends CommandBase {
-    public BridgeTipDownCommand() {
+import edu.wpi.first.wpilibj.DriverStation;
+
+public class AutonomousBridgeTipCommand extends CommandBase {
+    boolean value;
+    
+    public AutonomousBridgeTipCommand(boolean value) {
         // Use requires() here to declare subsystem dependencies
         requires(bridgeTipSubsystem);
+        
+        this.value = value;
     }
 
     // Called just before this Command runs the first time
@@ -13,13 +19,12 @@ public class BridgeTipDownCommand extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         boolean override = false;
-        boolean request = true;
-        bridgeTipSubsystem.set(override, request);
+        bridgeTipSubsystem.set(override, value);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return bridgeTipSubsystem.get();
+        return !DriverStation.getInstance().isAutonomous();
     }
 
     // Called once after isFinished returns true
