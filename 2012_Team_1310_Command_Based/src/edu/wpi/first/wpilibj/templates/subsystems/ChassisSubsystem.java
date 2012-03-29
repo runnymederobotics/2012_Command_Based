@@ -83,8 +83,8 @@ public class ChassisSubsystem extends Subsystem {
         
         pidLeft = new ParsablePIDController("pidLeft", robotCLI.getVariables(), 0.0, 0.0025, 0.0, -1.0, 1.0, 50);
         pidRight = new ParsablePIDController("pidRight", robotCLI.getVariables(), 0.0, 0.0025, 0.0, -1.0, 1.0, 50);
-        pidLeftCount = new ParsablePIDController("pidLeftCount", robotCLI.getVariables(), 0.0075, 0.0, 0.0, -0.75, 0.75, 50);
-        pidRightCount = new ParsablePIDController("pidRightCount", robotCLI.getVariables(), 0.0075, 0.0, 0.0, -0.75, 0.75, 50);
+        pidLeftCount = new ParsablePIDController("pidLeftCount", robotCLI.getVariables(), 0.0075, 0.0, 0.0, -0.9, 0.9, 50);
+        pidRightCount = new ParsablePIDController("pidRightCount", robotCLI.getVariables(), 0.0075, 0.0, 0.0, -0.9, 0.9, 50);
 
         encLeft.start();
         encRight.start();
