@@ -16,6 +16,7 @@ public class BridgeTipSubsystem extends Subsystem {
     // here. Call these from Commands.
 
     ParsableDouble LOCK_DELAY;
+    ParsableDouble UNLOCK_DELAY;
     
     ParsableDouble LOCK_RIGHT;
     ParsableDouble UNLOCK_RIGHT;
@@ -33,8 +34,9 @@ public class BridgeTipSubsystem extends Subsystem {
     
     public BridgeTipSubsystem(RobotCLI robotCLI) {
         VariableContainer vc = robotCLI.getVariables().createContainer("bridgeTipSubsystem");
-        LOCK_DELAY = vc.createDouble("lockDelay", 1.0);
-        
+        LOCK_DELAY = vc.createDouble("lockDelay", 0.5);
+        UNLOCK_DELAY = vc.createDouble("unlockDelay", 0.25);
+                
         LOCK_RIGHT = vc.createDouble("lockRight", 1.0);
         UNLOCK_RIGHT = vc.createDouble("unlockRight", 0.71);
         LOCK_LEFT = vc.createDouble("lockLeft", 0.0);
@@ -79,12 +81,15 @@ public class BridgeTipSubsystem extends Subsystem {
                 }
             }
 
-            if(lastSetTime != 0 && now - lastSetTime > LOCK_DELAY.get()) {
-                lastSetTime = 0; //Reset lastSetTime
-                if(actualValue && requestValue) {
+            if(actualValue && requestValue) {
+                if(lastSetTime != 0 && now - lastSetTime > LOCK_DELAY.get()) {
+                    lastSetTime = 0; //Reset lastSetTime
                     rightLockPosition = LOCK_RIGHT.get(); //We went down so lock in
                     leftLockPosition = LOCK_LEFT.get();
-                } else {
+                }
+            } else {
+                if(lastSetTime != 0 && now - lastSetTime > UNLOCK_DELAY.get()) {
+                    lastSetTime = 0; //Reset lastSetTime
                     bridgeTipperPneumatic.set(false); //We wanted to go up
                 }
             }
