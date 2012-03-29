@@ -46,12 +46,12 @@ public class DriveDistanceCommand extends CommandBase {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        double inclineAngle = Math.abs(chassisSubsystem.getYZAngle());
+        //double inclineAngle = Math.abs(chassisSubsystem.getYZAngle());
         //If our gyro says we are on an incline then we need to stop
         //TODO: Make this logic work
-        boolean onBridge = inclineAngle > AutoBalanceCommand.HORIZONTAL_TOLERANCE && inclineAngle < AutoBalanceCommand.INCLINE;
+        //boolean onBridge = inclineAngle > AutoBalanceCommand.HORIZONTAL_TOLERANCE && inclineAngle < AutoBalanceCommand.INCLINE;
         //End the command when we've reached our setpoint or if we are in teleop mode
-        return chassisSubsystem.reachedCountSetpoint() || DriverStation.getInstance().isOperatorControl() || onBridge;
+        return chassisSubsystem.reachedCountSetpoint() || DriverStation.getInstance().isOperatorControl();// || onBridge;
     }
 
     // Called once after isFinished returns true

@@ -61,6 +61,7 @@ public class RobotTemplate extends IterativeRobot {
         autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip", ShootTipCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip-Then-Shoot", ShootTipShootCommandGroup.creator());
+        autonomousChooser.addObject("Alley-Oop-Shoot-Tip-Shoot", AlleyOopShootTipShootCommandGroup.creator());
         
         SmartDashboard.putData("Autonomous", autonomousChooser);
     }

@@ -24,6 +24,5 @@ public class AlleyOopCommandGroup extends CommandGroup {
         
         addSequential(new DriveDistanceCommand(-400));
         addSequential(new AutonomousShootCommand(false, true));
-        //addSequential(new DriveDistanceCommand(-1000));
     }
 }
