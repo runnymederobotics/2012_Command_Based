@@ -24,13 +24,8 @@ public class ChassisSubsystem extends Subsystem {
     // here. Call these from Commands.
     
     public final boolean USE_AUTO_TRANS = false;
-    
-    final double PID_COUNT_MAX_INPUT = Short.MAX_VALUE;
-    final double PID_COUNT_MIN_INPUT = -Short.MAX_VALUE;
-    
-    final double PID_P = 0.0, PID_I = 0.0003, PID_D = 0.0;
+
     final double PID_GYRO_P = 0.001, PID_GYRO_I = 0.0, PID_GYRO_D = 0.0;
-    final double PID_COUNT_P = 0.05, PID_COUNT_I = 0.0, PID_COUNT_D = 0.0;
     
     ParsableInteger MAX_LOW_ENCODER_RATE;
     ParsableInteger MAX_HIGH_ENCODER_RATE;
