@@ -51,7 +51,7 @@ public class AutonomousShootCommand extends CommandBase {
         boolean turretOnTarget = true;
         
         shooterRunning = shooterSubsystem.getShooterRunning();
-        //shooterOnTarget = shooterSubsystem.onTarget();
+        shooterOnTarget = shooterSubsystem.onTarget();
         if(trackTarget) {
             turretOnTarget = turretSubsystem.onTarget();
         }

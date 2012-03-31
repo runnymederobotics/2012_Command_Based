@@ -30,7 +30,7 @@ public class ShooterSubsystem extends Subsystem {
         VariableContainer vc = robotCLI.getVariables().createContainer("shooterSubsystem");
         
         MAX_SHOOTER_ENCODER_RATE = vc.createInteger("maxShooterEncoderRate", 2800);
-        READY_TO_SHOOT_TOLERANCE = vc.createDouble("readyToShootTolerance", 400); //Changed from 150
+        READY_TO_SHOOT_TOLERANCE = vc.createDouble("readyToShootTolerance", 200); //Changed from 150
         pidShooter = new ParsablePIDController("pidShooter", robotCLI.getVariables(), 0.002, 0.0, 0.0, 0.0, 1.0, 50);
         
         Arrays.sort(setpointLookupTable, new Comparer() {
