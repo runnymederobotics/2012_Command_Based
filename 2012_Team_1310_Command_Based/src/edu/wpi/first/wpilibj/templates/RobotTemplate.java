@@ -57,12 +57,12 @@ public class RobotTemplate extends IterativeRobot {
         
         autonomousChooser.addDefault("Nothing", DoNothingCommandGroup.creator());
         autonomousChooser.addObject("Continuous-Shoot", ContinuousShootCommandGroup.creator());
-        autonomousChooser.addObject("Continuous-Shoot-No-Track", ContinuousShootNoTrackCommandGroup.creator());
+        //autonomousChooser.addObject("Continuous-Shoot-No-Track", ContinuousShootNoTrackCommandGroup.creator());
         autonomousChooser.addObject("Alley-Oop", AlleyOopCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip", ShootTipCommandGroup.creator());
         autonomousChooser.addObject("Shoot-Then-Tip-Then-Shoot", ShootTipShootCommandGroup.creator());
-        autonomousChooser.addObject("Alley-Oop-Shoot-Tip-Shoot", AlleyOopShootTipShootCommandGroup.creator());
-        autonomousChooser.addObject("Tip-Then-Shoot", TipShootCommandGroup.creator());
+        //autonomousChooser.addObject("Alley-Oop-Shoot-Tip-Shoot", AlleyOopShootTipShootCommandGroup.creator());
+        //autonomousChooser.addObject("Tip-Then-Shoot", TipShootCommandGroup.creator());
         
         SmartDashboard.putData("Autonomous", autonomousChooser);
     }

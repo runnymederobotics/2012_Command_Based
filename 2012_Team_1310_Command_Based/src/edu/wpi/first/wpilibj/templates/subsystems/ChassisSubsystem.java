@@ -7,11 +7,11 @@ import RobotCLI.RobotCLI;
 import RobotCLI.RobotCLI.VariableContainer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Jaguar;
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableGyro;
-import edu.wpi.first.wpilibj.smartdashboard.SendablePIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.OutputStorage;
 import edu.wpi.first.wpilibj.templates.Pneumatic;
@@ -50,11 +50,11 @@ public class ChassisSubsystem extends Subsystem {
     ParsablePIDController pidLeft;// = new SendablePIDController(PID_P, PID_I, PID_D, encLeft, motorLeft);
     ParsablePIDController pidRight;// = new SendablePIDController(PID_P, PID_I, PID_D, encRight, motorRight);
     
-    SendableGyro gyroXY = new SendableGyro(RobotMap.GYRO_XY);
-    SendableGyro gyroYZ = new SendableGyro(RobotMap.GYRO_YZ);
+    Gyro gyroXY = new Gyro(RobotMap.GYRO_XY);
+    Gyro gyroYZ = new Gyro(RobotMap.GYRO_YZ);
     
     OutputStorage pidGyroStorage = new OutputStorage();
-    SendablePIDController pidGyro = new SendablePIDController(PID_GYRO_P, PID_GYRO_I, PID_GYRO_D, gyroXY, pidGyroStorage);
+    PIDController pidGyro = new PIDController(PID_GYRO_P, PID_GYRO_I, PID_GYRO_D, gyroXY, pidGyroStorage);
 
     ParsablePIDController pidLeftCount;// = new SendablePIDController(PID_COUNT_P, PID_COUNT_I, PID_COUNT_D, encLeftCount, pidLeftCountStorage);
     ParsablePIDController pidRightCount;// = new SendablePIDController(PID_COUNT_P, PID_COUNT_I, PID_COUNT_D, encRightCount, pidRightCountStorage);
@@ -87,7 +87,7 @@ public class ChassisSubsystem extends Subsystem {
         gyroXY.reset();
         gyroYZ.reset();
         
-        pidGyro.setTolerance(PID_GYRO_TOLERANCE.get() / 360);
+        pidGyro.setAbsoluteTolerance(PID_GYRO_TOLERANCE.get() / 360);
         pidGyro.setContinuous();
         pidGyro.setInputRange(-180, 180);
         pidGyro.setOutputRange(-PID_GYRO_MAX_OUTPUT.get(), PID_GYRO_MAX_OUTPUT.get());

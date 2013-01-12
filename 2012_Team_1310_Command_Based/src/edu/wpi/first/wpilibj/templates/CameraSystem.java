@@ -38,8 +38,8 @@ public class CameraSystem {
         try {
             init();
             foundTarget = networkTable.getBoolean("FoundTarget");
-            value[0] = networkTable.getDouble(field);
-            currentSequenceNumber = networkTable.getInt("SequenceNumber");
+            value[0] = networkTable.getNumber(field);
+            currentSequenceNumber = (int) networkTable.getNumber("SequenceNumber");
         } catch(Exception e) {
             return false;
         }

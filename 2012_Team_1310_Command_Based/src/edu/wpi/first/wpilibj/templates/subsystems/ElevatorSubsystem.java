@@ -67,11 +67,9 @@ public class ElevatorSubsystem extends Subsystem {
     public void updateDashboard() {
         //Update our ball counter on the dashboard
         if(bottomBall.get() != lastBottomBall || middleBall.get() != lastMiddleBall || topBall.get() != lastTopBall) {
-            ballCounter.beginTransaction();
             ballCounter.putBoolean("BottomBall", !bottomBall.get());
             ballCounter.putBoolean("MiddleBall", !middleBall.get());
             ballCounter.putBoolean("TopBall", !topBall.get());
-            ballCounter.endTransaction();
         }
         
         lastBottomBall = bottomBall.get();
